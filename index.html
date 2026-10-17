@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>聖若瑟教區中學第五校 · 初一數學應用課 (30週) 面向 PISA 2029 全球素養互動實驗室</title>
+  <meta name="description" content="聖若瑟教區中學第五校小六數學思維課30週校本教材互動實驗室，面向全球前瞻核心素養培育，涵蓋數量、空間與形狀、變化與關係、不確定性與數據及計算思維/資訊審查。原生支援 OMML 數學方程式與動態沙盒操作。">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <!-- MathJax 3 for Native Mathematical Typography & OMML/MathML Rendering -->
+  <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: { fontCache: 'global' }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+</head>
+<body>
+  <!-- Header Bar -->
+  <header class="app-header">
+    <div class="header-left">
+      <button id="sidebarToggle" class="btn-icon" title="切換選單"><i class="fa-solid fa-bars"></i></button>
+      <div class="brand">
+        <span class="badge-school">聖若瑟五校 · 校本教材</span>
+        <h1 class="brand-title">初一數學應用課 30 週互動實驗室</h1>
+        <span class="badge-pisa"><i class="fa-solid fa-compass"></i> 全球前瞻核心素養</span>
+      </div>
+    <div class="grade-switcher" style="display:flex; gap:8px; margin-left:12px;">
+      <a href="g7.html" class="btn-sm btn-primary" style="text-decoration:none; font-weight:bold; padding:4px 10px; border-radius:6px; background:#1e40af; color:#fff;">📙 初一 (30週)</a>
+      <a href="index.html" class="btn-sm btn-secondary" style="text-decoration:none; padding:4px 10px; border-radius:6px; background:#e2e8f0; color:#1e293b;">📘 小六 (30週)</a>
+    </div>
+
+    </div>
+    <div class="header-center">
+      <div class="week-stepper">
+        <button id="btnPrevWeek" class="btn-step" title="上一週 (←)"><i class="fa-solid fa-chevron-left"></i> 上一週</button>
+        <select id="weekSelect" class="week-select"></select>
+        <button id="btnNextWeek" class="btn-step" title="下一週 (→)">下一週 <i class="fa-solid fa-chevron-right"></i></button>
+      </div>
+    </div>
+    <div class="header-right">
+      <button id="btnToggleCER" class="btn-action"><i class="fa-solid fa-gavel"></i> <span class="hide-sm">思維法庭真相</span></button>
+      <button id="btnFullscreen" class="btn-icon" title="全螢幕投影"><i class="fa-solid fa-expand"></i></button>
+    </div>
+  </header>
+
+  <!-- Main Container with Sidebar & Content -->
+  <div class="app-container">
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="app-sidebar">
+      <div class="sidebar-header">
+        <div class="filter-tabs">
+          <button class="filter-tab active" data-filter="all">全部 (30)</button>
+          <button class="filter-tab" data-filter="t1">上學期 (15)</button>
+          <button class="filter-tab" data-filter="t2">下學期 (15)</button>
+        </div>
+        <div class="search-box">
+          <i class="fa-solid fa-magnifying-glass"></i>
+          <input type="text" id="lessonSearch" placeholder="搜尋週次、主題或關鍵字...">
+        </div>
+      </div>
+      <div id="lessonList" class="lesson-list">
+        <!-- Rendered via JS -->
+      </div>
+    </aside>
+
+    <!-- Main Experiment Canvas & Lab Area -->
+    <main class="app-main">
+      <!-- Lesson Info Bar -->
+      <section class="lesson-banner">
+        <div class="banner-top">
+          <span id="bannerWeek" class="tag-week">第 01 週</span>
+          <span id="bannerDomain" class="tag-domain">數量 (Quantity)</span>
+          <span id="bannerUnit" class="tag-unit">6上 課次1: 生活中的比 (一)</span>
+        </div>
+        <h2 id="bannerTitle" class="lesson-headline">果汁濃度與比值的本質——破除『數字大就濃』的直覺迷思</h2>
+        <p id="bannerCoords" class="lesson-coords"></p>
+      </section>
+
+      <!-- Grid Layout: Left Control & Info / Right Interactive Sandbox -->
+      <div class="lab-grid">
+        <!-- Left Panel: Context & Instructions & Kid-Friendly Courtroom -->
+        <div class="panel-left">
+          <!-- Real-world Context Card (Neutral Title) -->
+          <div class="card context-card">
+            <div class="card-header">
+              <i class="fa-solid fa-newspaper text-primary"></i>
+              <h3>一、 生活真實情境導引與資訊審查</h3>
+            </div>
+            <div class="card-body">
+              <div id="contextText" class="context-desc"></div>
+              <div class="misconception-box">
+                <div class="miscon-title"><i class="fa-solid fa-triangle-exclamation text-warning"></i> 思考盲區與直覺迷思：</div>
+                <div id="misconceptionText" class="miscon-desc"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Experiment Guide Card -->
+          <div class="card guide-card">
+            <div class="card-header">
+              <i class="fa-solid fa-vial text-info"></i>
+              <h3>二、 課堂動態實驗操作指引</h3>
+            </div>
+            <div class="card-body">
+              <div id="expPrinciple" class="guide-principle"></div>
+              <ol id="expStepsList" class="steps-list"></ol>
+            </div>
+          </div>
+
+          <!-- Kid-Friendly CER Courtroom Card -->
+          <div id="cerCard" class="card cer-card collapsed">
+            <div class="card-header" id="cerHeader">
+              <i class="fa-solid fa-shield-halved text-success"></i>
+              <h3>三、 數學小法庭：思維論證四步走（點擊展開/收起真相）</h3>
+              <i class="fa-solid fa-chevron-down cer-arrow"></i>
+            </div>
+            <div class="card-body cer-content">
+              <div class="cer-item cer-claim">
+                <span class="cer-tag tag-claim">🟢 我的主張 (Claim) · 亮出觀點立場</span>
+                <p id="cerClaim"></p>
+              </div>
+              <div class="cer-item cer-evidence">
+                <span class="cer-tag tag-evidence">🟡 事實證據 (Evidence) · 拿事實與數據算理</span>
+                <p id="cerEvidence"></p>
+              </div>
+              <div class="cer-item cer-reasoning">
+                <span class="cer-tag tag-reasoning">🔵 數學道理 (Reasoning) · 講清背後模型原理</span>
+                <p id="cerReasoning"></p>
+              </div>
+              <div class="cer-item cer-rebuttal">
+                <span class="cer-tag tag-rebuttal">🔴 擊破迷思 (Rebuttal) · 反駁直覺想當然</span>
+                <p id="cerRebuttal"></p>
+              </div>
+            </div>
+          </div>
+
+          <!-- CPS Challenge Card (Neutral Title & Collapsible Reference Solution) -->
+          <div class="card cps-card">
+            <div class="card-header">
+              <i class="fa-solid fa-brain text-warning"></i>
+              <h3>四、 計算思維與演算法高階拓展挑戰</h3>
+            </div>
+            <div class="card-body">
+              <div id="cpsChallengeText" class="cps-desc"></div>
+              <div class="cps-solution-container">
+                <button id="btnToggleSolution" class="btn-toggle-solution" type="button">
+                  <i class="fa-solid fa-lightbulb"></i> <span id="solutionBtnText">查看參考解答與思維解析</span>
+                </button>
+                <div id="solutionBox" class="solution-box" style="display: none;">
+                  <div class="solution-header">
+                    <i class="fa-solid fa-circle-check text-success"></i> <strong>參考解答與演算法分步解析：</strong>
+                  </div>
+                  <div id="solutionContent" class="solution-content"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Panel: Dynamic Interactive Sandbox & OMML Equation Card -->
+        <div class="panel-right">
+          <!-- Sandbox Card -->
+          <div class="card sandbox-card">
+            <div class="card-header sandbox-header">
+              <div class="sandbox-title">
+                <i class="fa-solid fa-sliders text-primary"></i>
+                <h3 id="sandboxName">動態實驗台</h3>
+              </div>
+              <div class="sandbox-actions">
+                <button id="btnResetExp" class="btn-secondary btn-sm" title="重置本實驗 (R)"><i class="fa-solid fa-rotate-left"></i> 重置</button>
+                <button id="btnRecordData" class="btn-primary btn-sm" title="記錄當前參數"><i class="fa-solid fa-camera"></i> 記錄數據</button>
+              </div>
+            </div>
+
+            <!-- Sandbox Interactive Body -->
+            <div class="sandbox-body">
+              <!-- Controls Bar: Sliders, Buttons, Inputs -->
+              <div id="sandboxControls" class="sandbox-controls">
+                <!-- Dynamically populated by JS based on current week -->
+              </div>
+
+              <!-- Interactive Visual Canvas / SVG Stage -->
+              <div id="sandboxStage" class="sandbox-stage">
+                <canvas id="mainCanvas" width="700" height="420"></canvas>
+                <div id="svgStageOverlay" class="svg-overlay"></div>
+              </div>
+
+              <!-- Live Formula & Readout Bar -->
+              <div id="sandboxReadout" class="sandbox-readout">
+                <!-- Real-time metrics -->
+              </div>
+            </div>
+          </div>
+
+          <!-- OMML Native Math Formula Card (NEW) -->
+          <div class="card omml-card">
+            <div class="card-header omml-header">
+              <div class="omml-header-left">
+                <i class="fa-solid fa-square-root-variable text-primary"></i>
+                <h3 id="ommlTitle">本課核心數學模型方程式</h3>
+              </div>
+              <div class="omml-header-right">
+                <button id="btnCopyOmml" class="btn-copy-omml" title="點擊複製數學公式，可直接貼入 Word"><i class="fa-solid fa-copy"></i> 複製數學公式</button>
+                <button id="btnToggleOmmlXml" class="btn-secondary btn-xs" title="檢視 OMML XML 源代碼">檢視 XML</button>
+              </div>
+            </div>
+            <div class="card-body omml-body">
+              <div id="mathjaxFormula" class="mathjax-formula-box">
+                <!-- MathJax renders TeX/MathML formula here -->
+              </div>
+              <div id="ommlXmlBox" class="omml-xml-box" style="display: none;">
+                <textarea id="ommlXmlText" readonly class="omml-textarea"></textarea>
+                <div class="omml-tip">💡 提示：在 Word 中按快捷鍵 Alt + = 開啟公式輸入框，粘貼上述 XML 代碼即自動轉換為 Office 原生編輯方程式！</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dynamic Observation Table Card -->
+          <div class="card table-card">
+            <div class="card-header">
+              <i class="fa-solid fa-table text-primary"></i>
+              <h3>動態實驗觀測紀錄表</h3>
+              <button id="btnClearTable" class="btn-link btn-xs">清空記錄</button>
+            </div>
+            <div class="card-body">
+              <div class="table-responsive">
+                <table id="obsTable" class="obs-table">
+                  <thead id="obsThead"></thead>
+                  <tbody id="obsTbody"></tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="toast"></div>
+
+  <!-- Main Engine Script -->
+  <script src="app_g7.js"></script>
+</body>
+</html>
