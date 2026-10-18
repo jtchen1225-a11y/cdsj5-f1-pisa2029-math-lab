@@ -2132,19 +2132,10 @@ const LESSONS_DATA = [
   }
 ];
 
-// ============================================================================
-// 聖若瑟教區中學第五校 · 初一數學應用課 (30週) 全套動態互動實驗模組庫
-// 面向 PISA 2029 全球素養培育校本教材 (人教版2024七年級上/下冊知識主線)
-// 包含滑桿 (Sliders)、平移 (Translation)、旋轉 (Rotation)、添加 (Adding) 等互動功能
-// ============================================================================
+window.experiments_g7 = window.experiments_g7 || {};
 
-window.experiments_g7 = {};
-
-// Helper: Setup Canvas resolution
 function setupCanvas(canvas) {
   const ctx = canvas.getContext('2d');
-  const dpr = window.devicePixelRatio || 1;
-  const rect = canvas.getBoundingClientRect();
   if (canvas.width !== 700 || canvas.height !== 420) {
     canvas.width = 700;
     canvas.height = 420;
@@ -2153,7 +2144,7 @@ function setupCanvas(canvas) {
 }
 
 // ----------------------------------------------------------------------------
-// 第 01 週：基準量零點平移與盈虧平衡動態模擬台 (正數和負數 / 基準量平移)
+// 第 01 週：基準量零點平移與盈虧平衡動態模擬台
 // ----------------------------------------------------------------------------
 window.experiments_g7[1] = {
   init: function(ctrl, canvas, readout) {
@@ -2198,16 +2189,14 @@ window.experiments_g7[1] = {
         <span class="readout-item">1月偏差: <strong>${d1 >= 0 ? '+' : ''}${d1.toLocaleString()} 元</strong></span>
         <span class="readout-item">2月偏差: <strong>${d2 >= 0 ? '+' : ''}${d2.toLocaleString()} 元</strong></span>
         <span class="readout-item">3月偏差: <strong>${d3 >= 0 ? '+' : ''}${d3.toLocaleString()} 元</strong></span>
-        <span class="readout-item">累計淨利潤偏差: <strong style="color:${totalDev >= 0 ? '#38a169':'#e53e3e'}">${totalDev >= 0 ? '+' : ''}${totalDev.toLocaleString()} 元</strong></span>
+        <span class="readout-item">累計淨偏差: <strong style="color:${totalDev >= 0 ? '#059669':'#dc2626'}">${totalDev >= 0 ? '+' : ''}${totalDev.toLocaleString()} 元</strong></span>
         <span class="readout-item">實際總流水: <strong>${totalR.toLocaleString()} 元</strong></span>
       `;
 
-      // Draw Chart
       ctx.clearRect(0, 0, 700, 420);
       ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, 700, 420);
 
-      // Baseline line
       const zeroY = 220;
       ctx.strokeStyle = '#e2e8f0';
       ctx.lineWidth = 1;
@@ -2215,7 +2204,6 @@ window.experiments_g7[1] = {
         ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(660, y); ctx.stroke();
       }
 
-      // Draw Base Zero Line
       ctx.strokeStyle = '#1e293b';
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(60, zeroY); ctx.lineTo(660, zeroY); ctx.stroke();
@@ -2223,7 +2211,6 @@ window.experiments_g7[1] = {
       ctx.font = 'bold 12px sans-serif';
       ctx.fillText(`保本基準線 B = ${B.toLocaleString()} 元 (相對零點 0)`, 70, zeroY - 8);
 
-      // Bars for Month 1, 2, 3 and Cumulative
       const months = [
         { name: '1月份', val: d1, x: 120 },
         { name: '2月份', val: d2, x: 250 },
@@ -2232,7 +2219,7 @@ window.experiments_g7[1] = {
       ];
 
       months.forEach(m => {
-        const h = (m.val / 50000) * 120; // scale
+        const h = (m.val / 50000) * 120;
         const barY = m.val >= 0 ? zeroY - h : zeroY;
         const barH = Math.abs(h);
 
@@ -2259,7 +2246,7 @@ window.experiments_g7[1] = {
 };
 
 // ----------------------------------------------------------------------------
-// 第 02 週：數軸動態平移與輕軌站點位移向量實驗台 (數軸與相反數 / 空間坐標)
+// 第 02 週：數軸動態平移與輕軌站點位移向量實驗台
 // ----------------------------------------------------------------------------
 window.experiments_g7[2] = {
   init: function(ctrl, canvas, readout) {
@@ -2284,45 +2271,31 @@ window.experiments_g7[2] = {
     const ctx = setupCanvas(canvas);
     let currentX = -3;
     let targetX = 2;
-    let animProgress = 1.0;
-    let animId = null;
 
     function render(trainPos) {
       ctx.clearRect(0, 0, 700, 420);
       ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, 700, 420);
 
-      // Title
       ctx.fillStyle = '#1e293b';
       ctx.font = 'bold 15px sans-serif';
       ctx.fillText('澳門輕軌氹仔線數軸位移向量模型 (原點 0: 海洋站, 向東為正)', 60, 40);
 
-      // Number line
       const axisY = 220;
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 3;
-      ctx.beginPath();
-      ctx.moveTo(50, axisY);
-      ctx.lineTo(650, axisY);
-      ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(50, axisY); ctx.lineTo(650, axisY); ctx.stroke();
 
-      // Arrow
       ctx.fillStyle = '#334155';
       ctx.beginPath();
-      ctx.moveTo(650, axisY - 6);
-      ctx.lineTo(662, axisY);
-      ctx.lineTo(650, axisY + 6);
-      ctx.fill();
+      ctx.moveTo(650, axisY - 6); ctx.lineTo(662, axisY); ctx.lineTo(650, axisY + 6); ctx.fill();
 
-      // Ticks (-6 to +8)
-      const scale = 40; // 40px per km
+      const scale = 40;
       const originX = 350;
 
       for (let k = -6; k <= 7; k++) {
         const tx = originX + k * scale;
-        ctx.beginPath();
-        ctx.moveTo(tx, axisY - 8);
-        ctx.lineTo(tx, axisY + 8);
+        ctx.beginPath(); ctx.moveTo(tx, axisY - 8); ctx.lineTo(tx, axisY + 8);
         ctx.strokeStyle = k === 0 ? '#2563eb' : '#64748b';
         ctx.lineWidth = k === 0 ? 3 : 1;
         ctx.stroke();
@@ -2333,7 +2306,6 @@ window.experiments_g7[2] = {
         ctx.fillText(k > 0 ? `+${k}` : `${k}`, tx, axisY + 24);
       }
 
-      // Stations
       const stations = [
         { name: '媽閣', x: -3 },
         { name: '海洋 (原點)', x: 0 },
@@ -2350,19 +2322,14 @@ window.experiments_g7[2] = {
         ctx.fillText(s.name, sx, axisY - 14);
       });
 
-      // Vector Arrow from start to current animated position
       const startPx = originX + currentX * scale;
       const curPx = originX + trainPos * scale;
 
       if (Math.abs(curPx - startPx) > 1) {
         ctx.strokeStyle = '#10b981';
         ctx.lineWidth = 4;
-        ctx.beginPath();
-        ctx.moveTo(startPx, axisY - 30);
-        ctx.lineTo(curPx, axisY - 30);
-        ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(startPx, axisY - 30); ctx.lineTo(curPx, axisY - 30); ctx.stroke();
 
-        // Vector arrow head
         const dir = curPx > startPx ? 1 : -1;
         ctx.fillStyle = '#10b981';
         ctx.beginPath();
@@ -2377,7 +2344,6 @@ window.experiments_g7[2] = {
         ctx.fillText(`位移向量 s⃗ = ${dispVal >= 0 ? '+' : ''}${dispVal.toFixed(1)} km`, (startPx + curPx) / 2, axisY - 45);
       }
 
-      // Train Graphic
       ctx.fillStyle = '#2563eb';
       ctx.fillRect(curPx - 20, axisY - 12, 40, 24);
       ctx.fillStyle = '#ffffff';
@@ -2394,19 +2360,17 @@ window.experiments_g7[2] = {
       const disp = parseFloat(document.getElementById('rngDisplace').value);
       document.getElementById('valDisplace').textContent = `${disp >= 0 ? '+' : ''}${disp} km (${disp >= 0 ? '向東' : '向西'})`;
       targetX = currentX + disp;
-
       const dist = Math.abs(disp);
       readout.innerHTML = `
         <span class="readout-item">起點坐標: <strong>x1 = ${currentX} km</strong></span>
         <span class="readout-item">目標終點坐標: <strong>x2 = ${targetX} km</strong></span>
         <span class="readout-item">位移向量: <strong style="color:${disp>=0?'#059669':'#dc2626'}">${disp >= 0 ? '+' : ''}${disp} km</strong></span>
-        <span class="readout-item">標量路程 (絕對值): <strong>|${disp}| = ${dist} km</strong></span>
+        <span class="readout-item">標量路程: <strong>|${disp}| = ${dist} km</strong></span>
       `;
       render(currentX);
     }
 
     document.getElementById('rngDisplace').addEventListener('input', update);
-
     document.getElementById('btnStation1').onclick = () => { currentX = -3; document.getElementById('stationName').textContent = '媽閣站 (x = -3)'; update(); };
     document.getElementById('btnStation2').onclick = () => { currentX = 0; document.getElementById('stationName').textContent = '海洋站 (x = 0)'; update(); };
     document.getElementById('btnStation3').onclick = () => { currentX = 2; document.getElementById('stationName').textContent = '馬會站 (x = +2)'; update(); };
@@ -2433,17 +2397,13 @@ window.experiments_g7[2] = {
       requestAnimationFrame(step);
     };
 
-    document.getElementById('btnResetTrain').onclick = () => {
-      currentX = 0;
-      update();
-    };
-
+    document.getElementById('btnResetTrain').onclick = () => { currentX = 0; update(); };
     update();
   }
 };
 
 // ----------------------------------------------------------------------------
-// 第 03 週：工業公差邊界與絕對值不等式篩檢台 (|x - x0| ≤ δ)
+// 第 03 週：工業公差邊界與絕對值不等式篩檢台
 // ----------------------------------------------------------------------------
 window.experiments_g7[3] = {
   init: function(ctrl, canvas, readout) {
@@ -2457,7 +2417,7 @@ window.experiments_g7[3] = {
         <input type="range" id="rngDelta" min="0.01" max="0.10" step="0.01" value="0.05">
       </div>
       <div class="control-row">
-        <button id="btnSample" class="btn-sm btn-primary"><i class="fa-solid fa-dice"></i> 隨機生產 10 個零件抽檢</button>
+        <button id="btnSample" class="btn-sm btn-primary"><i class="fa-solid fa-dice"></i> 隨機生產 5 個零件抽檢</button>
         <button id="btnClearSample" class="btn-sm btn-outline"><i class="fa-solid fa-trash"></i> 清空樣本</button>
       </div>
     `;
@@ -2492,33 +2452,26 @@ window.experiments_g7[3] = {
       ctx.fillStyle = '#f8fafc';
       ctx.fillRect(0, 0, 700, 420);
 
-      // Title
       ctx.fillStyle = '#1e293b';
       ctx.font = 'bold 15px sans-serif';
       ctx.fillText(`工業零件尺寸絕對值公差邊界: |x - ${x0.toFixed(2)}| ≤ ${delta.toFixed(2)} mm`, 60, 40);
 
-      // Axis for tolerance inspection
       const cy = 200;
-      const scale = 1600; // px per mm
+      const scale = 1600;
       const centerPx = 350;
-
-      // Draw safe tolerance zone
       const leftSafe = centerPx - delta * scale;
       const rightSafe = centerPx + delta * scale;
 
       ctx.fillStyle = 'rgba(16, 185, 129, 0.2)';
       ctx.fillRect(leftSafe, 80, rightSafe - leftSafe, 240);
-
       ctx.strokeStyle = '#059669';
       ctx.lineWidth = 2;
       ctx.strokeRect(leftSafe, 80, rightSafe - leftSafe, 240);
 
-      // Main axis
       ctx.strokeStyle = '#334155';
       ctx.lineWidth = 2;
       ctx.beginPath(); ctx.moveTo(60, cy); ctx.lineTo(640, cy); ctx.stroke();
 
-      // Center x0 line
       ctx.strokeStyle = '#2563eb';
       ctx.setLineDash([4, 4]);
       ctx.beginPath(); ctx.moveTo(centerPx, 70); ctx.lineTo(centerPx, 330); ctx.stroke();
@@ -2531,7 +2484,6 @@ window.experiments_g7[3] = {
       ctx.fillText(`下界: ${minX.toFixed(2)}`, leftSafe, 345);
       ctx.fillText(`上界: ${maxX.toFixed(2)}`, rightSafe, 345);
 
-      // Plot sample points
       samples.forEach((val, idx) => {
         const dev = val - x0;
         const px = centerPx + dev * scale;
@@ -2539,9 +2491,7 @@ window.experiments_g7[3] = {
         const isPass = Math.abs(dev) <= delta + 1e-6;
 
         ctx.fillStyle = isPass ? '#059669' : '#dc2626';
-        ctx.beginPath();
-        ctx.arc(px, py, 6, 0, Math.PI * 2);
-        ctx.fill();
+        ctx.beginPath(); ctx.arc(px, py, 6, 0, Math.PI * 2); ctx.fill();
 
         ctx.font = '10px sans-serif';
         ctx.fillText(val.toFixed(2), px, py - 9);
@@ -2559,8 +2509,194 @@ window.experiments_g7[3] = {
       }
       update();
     };
-    document.getElementById('btnClearSample').onclick = () => {
-      samples = [];
+    document.getElementById('btnClearSample').onclick = () => { samples = []; update(); };
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 04 週：跨國外幣結算與時區淨資產動態平衡實驗台 (有理數加減法)
+// ----------------------------------------------------------------------------
+window.experiments_g7[4] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-dollar-sign"></i> 美元匯率 (USD/MOP): <span id="valRateUSD" class="val-badge">8.10</span></label>
+        <input type="range" id="rngRateUSD" min="7.5" max="8.5" step="0.05" value="8.10">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-euro-sign"></i> 歐元匯率 (EUR/MOP): <span id="valRateEUR" class="val-badge">8.80</span></label>
+        <input type="range" id="rngRateEUR" min="8.0" max="9.5" step="0.05" value="8.80">
+      </div>
+      <div class="control-row">
+        <label>北美伺服器支出 (USD): <span id="valExpUSD" class="val-badge">-15,000 USD</span></label>
+        <input type="range" id="rngExpUSD" min="5000" max="30000" step="1000" value="15000">
+      </div>
+      <div class="control-row">
+        <label>歐洲版權收入 (EUR): <span id="valIncEUR" class="val-badge">+18,000 EUR</span></label>
+        <input type="range" id="rngIncEUR" min="5000" max="30000" step="1000" value="18000">
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    function update() {
+      const rUSD = parseFloat(document.getElementById('rngRateUSD').value);
+      const rEUR = parseFloat(document.getElementById('rngRateEUR').value);
+      const expUSD = parseFloat(document.getElementById('rngExpUSD').value);
+      const incEUR = parseFloat(document.getElementById('rngIncEUR').value);
+
+      document.getElementById('valRateUSD').textContent = rUSD.toFixed(2);
+      document.getElementById('valRateEUR').textContent = rEUR.toFixed(2);
+      document.getElementById('valExpUSD').textContent = `-${expUSD.toLocaleString()} USD`;
+      document.getElementById('valIncEUR').textContent = `+${incEUR.toLocaleString()} EUR`;
+
+      const mopBase = 120000;
+      const mopExpUSD = -expUSD * rUSD;
+      const mopIncEUR = incEUR * rEUR;
+      const netChange = mopBase + mopExpUSD + mopIncEUR;
+
+      readout.innerHTML = `
+        <span class="readout-item">澳門文創出口: <strong>+120,000 MOP</strong></span>
+        <span class="readout-item">北美雲端成本折算: <strong style="color:#dc2626">${mopExpUSD.toLocaleString(undefined, {maximumFractionDigits:0})} MOP</strong></span>
+        <span class="readout-item">歐洲版權收入折算: <strong style="color:#059669">+${mopIncEUR.toLocaleString(undefined, {maximumFractionDigits:0})} MOP</strong></span>
+        <span class="readout-item">全球結算淨資產: <strong style="color:${netChange >= 0 ? '#059669':'#dc2626'}">${netChange >= 0 ? '+' : ''}${netChange.toLocaleString(undefined, {maximumFractionDigits:0})} MOP</strong></span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('跨國時區外幣流動與有理數淨資產平衡模型 (單位: MOP)', 50, 40);
+
+      // Draw Cashflow Waterfall
+      const zeroY = 240;
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); ctx.moveTo(50, zeroY); ctx.lineTo(650, zeroY); ctx.stroke();
+      ctx.fillText('0 基準平衡線', 560, zeroY - 6);
+
+      const items = [
+        { label: '澳門總部', amt: mopBase, color: '#2563eb', x: 100 },
+        { label: '北美支出', amt: mopExpUSD, color: '#ef4444', x: 230 },
+        { label: '歐洲收入', amt: mopIncEUR, color: '#10b981', x: 360 },
+        { label: '最終淨值', amt: netChange, color: '#8b5cf6', x: 490 }
+      ];
+
+      items.forEach(it => {
+        const h = (it.amt / 200000) * 120;
+        const by = it.amt >= 0 ? zeroY - h : zeroY;
+        ctx.fillStyle = it.color;
+        ctx.fillRect(it.x, by, 70, Math.abs(h));
+
+        ctx.fillStyle = '#334155';
+        ctx.font = '11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(it.label, it.x + 35, zeroY + 20);
+
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillStyle = it.amt >= 0 ? '#047857' : '#b91c1c';
+        ctx.fillText((it.amt >= 0 ? '+' : '') + it.amt.toFixed(0), it.x + 35, it.amt >= 0 ? by - 6 : by + Math.abs(h) + 14);
+      });
+      ctx.textAlign = 'left';
+    }
+
+    ['rngRateUSD', 'rngRateEUR', 'rngExpUSD', 'rngIncEUR'].forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 05 週：運動學倒帶與負負得正嚴密論證台 (有理數乘除法)
+// ----------------------------------------------------------------------------
+window.experiments_g7[5] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-water"></i> 水位變化速度 v: <span id="valRateV" class="val-badge">-2 cm/天 (下降)</span></label>
+        <input type="range" id="rngRateV" min="-6" max="6" step="1" value="-2">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-clock-rotate-left"></i> 時間回溯 t: <span id="valTimeT" class="val-badge">-3 天 (過去)</span></label>
+        <input type="range" id="rngTimeT" min="-5" max="5" step="1" value="-3">
+      </div>
+      <div class="control-row">
+        <button id="btnRewind" class="btn-sm btn-primary"><i class="fa-solid fa-backward"></i> 時間倒帶播放</button>
+        <button id="btnForward" class="btn-sm btn-secondary"><i class="fa-solid fa-forward"></i> 時間正向播放</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    function update() {
+      const v = parseFloat(document.getElementById('rngRateV').value);
+      const t = parseFloat(document.getElementById('rngTimeT').value);
+
+      document.getElementById('valRateV').textContent = `${v >= 0 ? '+' : ''}${v} cm/天 (${v >= 0 ? '上升' : '下降'})`;
+      document.getElementById('valTimeT').textContent = `${t >= 0 ? '+' : ''}${t} 天 (${t >= 0 ? '未來' : '過去'})`;
+
+      const deltaH = v * t;
+      readout.innerHTML = `
+        <span class="readout-item">變化速度: <strong>v = ${v} cm/天</strong></span>
+        <span class="readout-item">時間節點: <strong>t = ${t} 天</strong></span>
+        <span class="readout-item">乘法模型: <strong>(${v}) × (${t}) = <span style="color:${deltaH>=0?'#059669':'#dc2626'}">${deltaH >= 0 ? '+' : ''}${deltaH} cm</span></strong></span>
+        <span class="readout-item">學理規律: <strong style="color:#2563eb">${v < 0 && t < 0 ? '負負得正 (過去水位必然比現在高)' : (v * t >= 0 ? '同號得正' : '異號得負')}</strong></span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('水庫水位升降與時間倒帶：(-v) × (-t) = +d 嚴密幾何論證', 50, 40);
+
+      // Dam Graphic
+      const curWaterY = 220;
+      const targetWaterY = curWaterY - deltaH * 5;
+
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.4)';
+      ctx.fillRect(100, targetWaterY, 400, 380 - targetWaterY);
+
+      // Current Water Level line
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(90, curWaterY); ctx.lineTo(510, curWaterY); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#2563eb';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('當前基準水位 (t = 0)', 520, curWaterY + 4);
+
+      // Target Water Level line
+      ctx.strokeStyle = deltaH >= 0 ? '#10b981' : '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(90, targetWaterY); ctx.lineTo(510, targetWaterY); ctx.stroke();
+      ctx.fillStyle = deltaH >= 0 ? '#047857' : '#b91c1c';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`${t < 0 ? '回溯過去水位' : '預測未來水位'}: ${deltaH >= 0 ? '+' : ''}${deltaH} cm`, 520, targetWaterY + 4);
+
+      // Ruler Gauge
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 4;
+      ctx.beginPath(); ctx.moveTo(90, 80); ctx.lineTo(90, 360); ctx.stroke();
+      for (let y = 100; y <= 340; y += 20) {
+        ctx.beginPath(); ctx.moveTo(80, y); ctx.lineTo(90, y); ctx.stroke();
+      }
+    }
+
+    ['rngRateV', 'rngTimeT'].forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+
+    document.getElementById('btnRewind').onclick = () => {
+      document.getElementById('rngTimeT').value = -4;
+      update();
+    };
+    document.getElementById('btnForward').onclick = () => {
+      document.getElementById('rngTimeT').value = 4;
       update();
     };
 
@@ -2568,111 +2704,2918 @@ window.experiments_g7[3] = {
   }
 };
 
-// Populate Weeks 4 to 30 dynamic simulation generic handlers
-for (let w = 4; w <= 30; w++) {
-  if (!window.experiments_g7[w]) {
-    (function(weekNum) {
-      window.experiments_g7[weekNum] = {
-        init: function(ctrl, canvas, readout) {
-          ctrl.innerHTML = `
-            <div class="control-row">
-              <label><i class="fa-solid fa-sliders text-primary"></i> 核心自變數控制: <span id="valParamA_${weekNum}" class="val-badge">50</span></label>
-              <input type="range" id="rngParamA_${weekNum}" min="1" max="100" value="50">
-            </div>
-            <div class="control-row">
-              <label><i class="fa-solid fa-gauge-high text-info"></i> 系統調節參數: <span id="valParamB_${weekNum}" class="val-badge">20</span></label>
-              <input type="range" id="rngParamB_${weekNum}" min="5" max="50" value="20">
-            </div>
-            <div class="control-row">
-              <button id="btnAction_${weekNum}" class="btn-sm btn-primary"><i class="fa-solid fa-play"></i> 執行交互動態演算</button>
-              <button id="btnReset_${weekNum}" class="btn-sm btn-outline"><i class="fa-solid fa-rotate"></i> 重置模型</button>
-            </div>
-          `;
+// ----------------------------------------------------------------------------
+// 第 06 週：天文尺度與大數據數量級審查 (乘方與科學記數法)
+// ----------------------------------------------------------------------------
+window.experiments_g7[6] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-square-root-variable"></i> 有效數字係數 a: <span id="valCoeffA" class="val-badge">3.0</span></label>
+        <input type="range" id="rngCoeffA" min="1.0" max="9.9" step="0.1" value="3.0">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrow-up-right-dots"></i> 10 的指數冪次 n: <span id="valExpN" class="val-badge">13 (萬億級 / 兆)</span></label>
+        <input type="range" id="rngExpN" min="-9" max="14" step="1" value="13">
+      </div>
+      <div class="control-row">
+        <button id="btnPresetChip" class="btn-sm btn-secondary">奈米晶片 (10⁻⁹)</button>
+        <button id="btnPresetDebt" class="btn-sm btn-secondary">萬億債務 (10¹³)</button>
+        <button id="btnPresetGalaxy" class="btn-sm btn-secondary">銀河光年 (10¹⁴)</button>
+      </div>
+    `;
 
-          const ctx = setupCanvas(canvas);
+    const ctx = setupCanvas(canvas);
+    function update() {
+      const a = parseFloat(document.getElementById('rngCoeffA').value);
+      const n = parseInt(document.getElementById('rngExpN').value);
 
-          function render() {
-            const pA = parseFloat(document.getElementById(`rngParamA_${weekNum}`).value);
-            const pB = parseFloat(document.getElementById(`rngParamB_${weekNum}`).value);
-            document.getElementById(`valParamA_${weekNum}`).textContent = pA;
-            document.getElementById(`valParamB_${weekNum}`).textContent = pB;
+      document.getElementById('valCoeffA').textContent = a.toFixed(1);
+      let desc = '';
+      if (n === -9) desc = '奈米級 (nm)';
+      else if (n === -6) desc = '微米級 (μm)';
+      else if (n === 0) desc = '個位級';
+      else if (n === 4) desc = '萬級';
+      else if (n === 8) desc = '億級';
+      else if (n === 12) desc = '萬億 (兆)';
+      else if (n === 13) desc = '十萬億級';
+      else desc = `${n} 次方`;
+      document.getElementById('valExpN').textContent = `${n} (${desc})`;
 
-            const calcVal = (pA * pB * 0.42).toFixed(2);
-            readout.innerHTML = `
-              <span class="readout-item">自變數 A: <strong>${pA}</strong></span>
-              <span class="readout-item">控制參數 B: <strong>${pB}</strong></span>
-              <span class="readout-item">動態演算指標: <strong style="color:#2563eb">${calcVal}</strong></span>
-              <span class="readout-item">模型收斂狀態: <strong style="color:#059669">✔ 正常運算中</strong></span>
-            `;
+      readout.innerHTML = `
+        <span class="readout-item">科學記數法表示: <strong>N = ${a.toFixed(1)} × 10<sup>${n}</sup></strong></span>
+        <span class="readout-item">數量級階次: <strong>10<sup>${n}</sup></strong></span>
+        <span class="readout-item">認知審查: <strong>${n >= 12 ? '大數據認知脫敏警戒區（數值極為龐大，需用比率審查）' : (n <= -6 ? '微觀量子與奈米尺度' : '人類生活可感知常規尺度')}</strong></span>
+      `;
 
-            ctx.clearRect(0, 0, 700, 420);
-            ctx.fillStyle = '#f8fafc';
-            ctx.fillRect(0, 0, 700, 420);
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
 
-            // Title
-            ctx.fillStyle = '#1e293b';
-            ctx.font = 'bold 15px sans-serif';
-            ctx.fillText(`第 ${weekNum} 週專題數學實驗台動態演算視窗`, 50, 40);
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('對數階梯數量級審查器：打破大數認知脫敏', 50, 40);
 
-            // Draw coordinate grid
-            ctx.strokeStyle = '#e2e8f0';
-            ctx.lineWidth = 1;
-            for (let x = 60; x <= 640; x += 40) {
-              ctx.beginPath(); ctx.moveTo(x, 60); ctx.lineTo(x, 360); ctx.stroke();
-            }
-            for (let y = 60; y <= 360; y += 40) {
-              ctx.beginPath(); ctx.moveTo(60, y); ctx.lineTo(640, y); ctx.stroke();
-            }
+      // Logarithmic Staircase
+      const minN = -9;
+      const maxN = 14;
+      const stepW = 580 / (maxN - minN);
 
-            // Draw mathematical function curve or dynamic geometric shape
-            ctx.strokeStyle = '#2563eb';
-            ctx.lineWidth = 3;
-            ctx.beginPath();
-            for (let px = 60; px <= 640; px += 5) {
-              const normX = (px - 60) / 580;
-              const py = 210 - Math.sin(normX * (pB / 5) * Math.PI) * (pA * 1.4);
-              if (px === 60) ctx.moveTo(px, py);
-              else ctx.lineTo(px, py);
-            }
-            ctx.stroke();
+      for (let k = minN; k <= maxN; k++) {
+        const x = 60 + (k - minN) * stepW;
+        const isCurrent = k === n;
 
-            // Focal moving indicator point
-            const focalX = 60 + (pA / 100) * 580;
-            const focalNormX = (focalX - 60) / 580;
-            const focalY = 210 - Math.sin(focalNormX * (pB / 5) * Math.PI) * (pA * 1.4);
+        ctx.fillStyle = isCurrent ? '#2563eb' : (k % 2 === 0 ? '#cbd5e1' : '#e2e8f0');
+        const h = 40 + (k - minN) * 11;
+        ctx.fillRect(x, 340 - h, stepW - 2, h);
 
-            ctx.fillStyle = '#ef4444';
-            ctx.beginPath();
-            ctx.arc(focalX, focalY, 8, 0, Math.PI * 2);
-            ctx.fill();
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = 2;
-            ctx.stroke();
-
-            ctx.fillStyle = '#1e293b';
-            ctx.font = 'bold 12px sans-serif';
-            ctx.fillText(`動態觀測點 (${focalX.toFixed(0)}, ${calcVal})`, focalX - 40, focalY - 14);
-          }
-
-          document.getElementById(`rngParamA_${weekNum}`).addEventListener('input', render);
-          document.getElementById(`rngParamB_${weekNum}`).addEventListener('input', render);
-          document.getElementById(`btnAction_${weekNum}`).onclick = () => {
-            const el = document.getElementById(`rngParamA_${weekNum}`);
-            el.value = (Math.random() * 80 + 10).toFixed(0);
-            render();
-          };
-          document.getElementById(`btnReset_${weekNum}`).onclick = () => {
-            document.getElementById(`rngParamA_${weekNum}`).value = 50;
-            document.getElementById(`rngParamB_${weekNum}`).value = 20;
-            render();
-          };
-
-          render();
+        if (k % 3 === 0 || isCurrent) {
+          ctx.fillStyle = isCurrent ? '#1e40af' : '#64748b';
+          ctx.font = isCurrent ? 'bold 11px sans-serif' : '9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.fillText(`10^${k}`, x + stepW / 2, 355);
         }
-      };
-    })(w);
+      }
+
+      ctx.textAlign = 'left';
+    }
+
+    ['rngCoeffA', 'rngExpN'].forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+
+    document.getElementById('btnPresetChip').onclick = () => { document.getElementById('rngExpN').value = -9; document.getElementById('rngCoeffA').value = 3.0; update(); };
+    document.getElementById('btnPresetDebt').onclick = () => { document.getElementById('rngExpN').value = 13; document.getElementById('rngCoeffA').value = 3.0; update(); };
+    document.getElementById('btnPresetGalaxy').onclick = () => { document.getElementById('rngExpN').value = 14; document.getElementById('rngCoeffA').value = 9.46; update(); };
+
+    update();
   }
-}
+};
+
+// ----------------------------------------------------------------------------
+// 第 07 週：二進制、十六進制與計算機底層 (進位制綜合實踐)
+// ----------------------------------------------------------------------------
+window.experiments_g7[7] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-microchip"></i> 8 位元二進制開關陣列 (點擊切換 0/1):</label>
+        <div id="bitButtons" style="display:flex; gap:6px; margin-top:6px;"></div>
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-sliders"></i> 十進制數值滑桿 (0 - 255): <span id="valDec" class="val-badge">65</span></label>
+        <input type="range" id="rngDec" min="0" max="255" step="1" value="65">
+      </div>
+      <div class="control-row">
+        <button id="btnAsciiA" class="btn-sm btn-secondary">字元 'A' (65)</button>
+        <button id="btnAsciiMacau" class="btn-sm btn-secondary">滿字節 (255)</button>
+        <button id="btnResetBit" class="btn-sm btn-outline">清零 (0)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    let bits = [0, 1, 0, 0, 0, 0, 0, 1]; // 65 = 'A'
+
+    function renderBitsUI() {
+      const container = document.getElementById('bitButtons');
+      container.innerHTML = '';
+      bits.forEach((b, idx) => {
+        const btn = document.createElement('button');
+        btn.className = `btn-sm ${b === 1 ? 'btn-primary' : 'btn-outline'}`;
+        btn.style.width = '40px';
+        btn.style.fontWeight = 'bold';
+        btn.textContent = b;
+        btn.onclick = () => {
+          bits[idx] = bits[idx] === 1 ? 0 : 1;
+          const dec = bits.reduce((acc, bit, i) => acc + bit * Math.pow(2, 7 - i), 0);
+          document.getElementById('rngDec').value = dec;
+          update();
+        };
+        container.appendChild(btn);
+      });
+    }
+
+    function update() {
+      const dec = parseInt(document.getElementById('rngDec').value);
+      document.getElementById('valDec').textContent = dec;
+
+      // Update bits array
+      for (let i = 0; i < 8; i++) {
+        bits[7 - i] = (dec >> i) & 1;
+      }
+      renderBitsUI();
+
+      const binStr = bits.join('');
+      const hexStr = dec.toString(16).toUpperCase().padStart(2, '0');
+      const asciiChar = (dec >= 32 && dec <= 126) ? String.fromCharCode(dec) : '[控制字元]';
+
+      readout.innerHTML = `
+        <span class="readout-item">十進制 (DEC): <strong>${dec}</strong></span>
+        <span class="readout-item">二進制 (BIN): <strong style="color:#2563eb">0b${binStr}</strong></span>
+        <span class="readout-item">十六進制 (HEX): <strong style="color:#059669">0x${hexStr}</strong></span>
+        <span class="readout-item">ASCII 解碼: <strong>${asciiChar}</strong></span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('計算機字節編碼底層權重分解：N = ∑ b_k · 2^k', 50, 40);
+
+      // Draw 8 bit boxes with weights
+      const startX = 60;
+      const boxW = 68;
+      const boxY = 140;
+
+      for (let i = 0; i < 8; i++) {
+        const x = startX + i * boxW;
+        const power = 7 - i;
+        const weight = Math.pow(2, power);
+        const isOn = bits[i] === 1;
+
+        ctx.fillStyle = isOn ? '#2563eb' : '#ffffff';
+        ctx.strokeStyle = isOn ? '#1d4ed8' : '#94a3b8';
+        ctx.lineWidth = 2;
+        ctx.fillRect(x, boxY, boxW - 8, 80);
+        ctx.strokeRect(x, boxY, boxW - 8, 80);
+
+        ctx.fillStyle = isOn ? '#ffffff' : '#1e293b';
+        ctx.font = 'bold 28px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(bits[i], x + (boxW - 8) / 2, boxY + 52);
+
+        // Weight text
+        ctx.fillStyle = '#64748b';
+        ctx.font = '11px sans-serif';
+        ctx.fillText(`2^${power}`, x + (boxW - 8) / 2, boxY + 105);
+        ctx.fillStyle = '#059669';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(`(${weight})`, x + (boxW - 8) / 2, boxY + 122);
+      }
+
+      ctx.textAlign = 'left';
+    }
+
+    document.getElementById('rngDec').addEventListener('input', () => {
+      update();
+    });
+
+    document.getElementById('btnAsciiA').onclick = () => { document.getElementById('rngDec').value = 65; update(); };
+    document.getElementById('btnAsciiMacau').onclick = () => { document.getElementById('rngDec').value = 255; update(); };
+    document.getElementById('btnResetBit').onclick = () => { document.getElementById('rngDec').value = 0; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 08 週：從生活文字迷宮到代數符號抽象 (列代數式)
+// ----------------------------------------------------------------------------
+window.experiments_g7[8] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-boxes-packing"></i> 購買數量 n: <span id="valQtyN" class="val-badge">5 件</span></label>
+        <input type="range" id="rngQtyN" min="1" max="20" step="1" value="5">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-tag"></i> 單價 p: <span id="valUnitPrice" class="val-badge">120 元</span></label>
+        <input type="range" id="rngUnitPrice" min="50" max="300" step="10" value="120">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-percent"></i> 會員折扣率 d: <span id="valDisc" class="val-badge">15% (0.15)</span></label>
+        <input type="range" id="rngDisc" min="0" max="40" step="5" value="15">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-truck-fast"></i> 免運費門檻件數 n0: <strong>6 件</strong>（未滿加收 30 元）</label>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    function update() {
+      const n = parseInt(document.getElementById('rngQtyN').value);
+      const p = parseFloat(document.getElementById('rngUnitPrice').value);
+      const dPercent = parseFloat(document.getElementById('rngDisc').value);
+      const d = dPercent / 100;
+
+      document.getElementById('valQtyN').textContent = `${n} 件`;
+      document.getElementById('valUnitPrice').textContent = `${p} 元`;
+      document.getElementById('valDisc').textContent = `${dPercent}% (${d.toFixed(2)})`;
+
+      const subtotal = n * p * (1 - d);
+      const shipping = n >= 6 ? 0 : 30;
+      const totalCost = subtotal + shipping;
+
+      readout.innerHTML = `
+        <span class="readout-item">商品折後小計: <strong>${subtotal.toFixed(1)} 元</strong></span>
+        <span class="readout-item">運費 f(n): <strong style="color:${shipping === 0 ? '#059669':'#dc2626'}">${shipping === 0 ? '0 元 (免運)' : '+30 元'}</strong></span>
+        <span class="readout-item">代數表達式: <strong>C(n) = n·p·(1-d) + f(n)</strong></span>
+        <span class="readout-item">最終應付總額: <strong style="color:#2563eb">${totalCost.toFixed(1)} 元</strong></span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('自然語言條款與代數函數模型對照視窗', 50, 40);
+
+      // Plot Cost Curve for n = 1 to 15
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      for (let y = 80; y <= 340; y += 40) {
+        ctx.beginPath(); ctx.moveTo(70, y); ctx.lineTo(630, y); ctx.stroke();
+      }
+
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let i = 1; i <= 15; i++) {
+        const x = 70 + (i - 1) * 38;
+        const c = i * p * (1 - d) + (i >= 6 ? 0 : 30);
+        const y = 340 - (c / 3000) * 240;
+        if (i === 1) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Current Point
+      const curX = 70 + (n - 1) * 38;
+      const curY = 340 - (totalCost / 3000) * 240;
+
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(curX, curY, 7, 0, Math.PI * 2); ctx.fill();
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`n=${n}, C=${totalCost.toFixed(0)}元`, curX - 20, curY - 14);
+
+      // Free shipping threshold marker
+      const thX = 70 + (6 - 1) * 38;
+      ctx.strokeStyle = '#059669';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(thX, 80); ctx.lineTo(thX, 340); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#059669';
+      ctx.fillText('免運門檻 n=6', thX - 30, 75);
+    }
+
+    ['rngQtyN', 'rngUnitPrice', 'rngDisc'].forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 09 週：澳門計程車跳表與平台動態定價 (代數式的值與分段求值)
+// ----------------------------------------------------------------------------
+window.experiments_g7[9] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-taxi"></i> 行駛里程 s: <span id="valMeterS" class="val-badge">3,800 米 (3.8 km)</span></label>
+        <input type="range" id="rngMeterS" min="500" max="10000" step="100" value="3800">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-stopwatch"></i> 等候/塞車時間 t: <span id="valWaitT" class="val-badge">180 秒 (3 分鐘)</span></label>
+        <input type="range" id="rngWaitT" min="0" max="600" step="30" value="180">
+      </div>
+      <div class="control-row">
+        <button id="btnTripGZ" class="btn-sm btn-secondary">關閘 ➔ 威尼斯人 (9.2km)</button>
+        <button id="btnTripHK" class="btn-sm btn-secondary">外港碼頭 ➔ 大三巴 (3.1km)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    function update() {
+      const s = parseInt(document.getElementById('rngMeterS').value);
+      const t = parseInt(document.getElementById('rngWaitT').value);
+
+      document.getElementById('valMeterS').textContent = `${s.toLocaleString()} 米 (${(s/1000).toFixed(2)} km)`;
+      document.getElementById('valWaitT').textContent = `${t} 秒 (${(t/60).toFixed(1)} 分鐘)`;
+
+      const baseFare = 21;
+      const extraDist = Math.max(0, s - 1600);
+      const distSteps = Math.ceil(extraDist / 220);
+      const distFare = distSteps * 2;
+      const waitSteps = Math.floor(t / 60);
+      const waitFare = waitSteps * 2;
+      const totalFare = baseFare + distFare + waitFare;
+
+      readout.innerHTML = `
+        <span class="readout-item">起步價 (首1600米): <strong>21 MOP</strong></span>
+        <span class="readout-item">里程跳表 (+${distSteps}次×2元): <strong>+${distFare} MOP</strong></span>
+        <span class="readout-item">等候跳表 (+${waitSteps}分×2元): <strong>+${waitFare} MOP</strong></span>
+        <span class="readout-item">計費函數: <strong>F = 21 + 2⌈(s-1600)/220⌉ + 2⌊t/60⌋</strong></span>
+        <span class="readout-item">跳表總車資: <strong style="color:#2563eb; font-size:1.15em;">${totalFare} MOP</strong></span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('澳門的士跳表計費器分段台階函數動畫', 50, 40);
+
+      // Draw Step Function Graph
+      const startX = 60;
+      const endX = 640;
+      const bottomY = 340;
+
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      for (let f = 20; f <= 90; f += 10) {
+        const y = bottomY - (f - 20) * 3.6;
+        ctx.beginPath(); ctx.moveTo(startX, y); ctx.lineTo(endX, y); ctx.stroke();
+        ctx.fillStyle = '#94a3b8'; ctx.font = '10px sans-serif';
+        ctx.fillText(`${f}元`, 25, y + 4);
+      }
+
+      // Step function curve for distance (up to 8000m)
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+
+      for (let dist = 0; dist <= 8000; dist += 220) {
+        const dNext = Math.min(dist + 220, 8000);
+        const x1 = startX + (dist / 8000) * 560;
+        const x2 = startX + (dNext / 8000) * 560;
+        const curFare = 21 + Math.ceil(Math.max(0, dist - 1600) / 220) * 2;
+        const y = bottomY - (curFare - 20) * 3.6;
+
+        ctx.beginPath(); ctx.moveTo(x1, y); ctx.lineTo(x2, y); ctx.stroke();
+      }
+
+      // Current taxi position dot
+      const dotX = startX + (Math.min(s, 8000) / 8000) * 560;
+      const dotY = bottomY - (totalFare - 20) * 3.6;
+
+      ctx.fillStyle = '#eab308';
+      ctx.beginPath(); ctx.arc(dotX, dotY, 9, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#ca8a04'; ctx.lineWidth = 2; ctx.stroke();
+
+      ctx.fillStyle = '#1e293b'; ctx.font = 'bold 13px sans-serif';
+      ctx.fillText(`當前車資: ${totalFare} MOP`, dotX - 40, dotY - 16);
+    }
+
+    ['rngMeterS', 'rngWaitT'].forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+
+    document.getElementById('btnTripGZ').onclick = () => { document.getElementById('rngMeterS').value = 9200; document.getElementById('rngWaitT').value = 360; update(); };
+    document.getElementById('btnTripHK').onclick = () => { document.getElementById('rngMeterS').value = 3100; document.getElementById('rngWaitT').value = 120; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 10 週：快遞紙箱用料最小化與同類項合併 (整式的加減)
+// ----------------------------------------------------------------------------
+window.experiments_g7[10] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-cube"></i> 長度 a: <span id="valBoxA" class="val-badge">30 cm</span></label>
+        <input type="range" id="rngBoxA" min="10" max="50" step="2" value="30">
+      </div>
+      <div class="control-row">
+        <label>寬度 b: <span id="valBoxB" class="val-badge">20 cm</span></label>
+        <input type="range" id="rngBoxB" min="10" max="40" step="2" value="20">
+      </div>
+      <div class="control-row">
+        <label>高度 c: <span id="valBoxC" class="val-badge">15 cm</span></label>
+        <input type="range" id="rngBoxC" min="5" max="30" step="1" value="15">
+      </div>
+      <div class="control-row">
+        <button id="btnCubeBox" class="btn-sm btn-secondary">立方體形 (20×20×20)</button>
+        <button id="btnFlatBox" class="btn-sm btn-secondary">扁平盒 (40×30×8)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    function update() {
+      const a = parseFloat(document.getElementById('rngBoxA').value);
+      const b = parseFloat(document.getElementById('rngBoxB').value);
+      const c = parseFloat(document.getElementById('rngBoxC').value);
+
+      document.getElementById('valBoxA').textContent = `${a} cm`;
+      document.getElementById('valBoxB').textContent = `${b} cm`;
+      document.getElementById('valBoxC').textContent = `${c} cm`;
+
+      const surfaceArea = 2 * (a * b + b * c + c * a);
+      const volume = a * b * c;
+      const ratio = (surfaceArea / volume).toFixed(3);
+
+      readout.innerHTML = `
+        <span class="readout-item">多項式展開: <strong>S = 2ab + 2bc + 2ca</strong></span>
+        <span class="readout-item">表面積: <strong>${surfaceArea.toLocaleString()} cm²</strong></span>
+        <span class="readout-item">體積: <strong>${volume.toLocaleString()} cm³</strong></span>
+        <span class="readout-item">耗材率 S/V: <strong style="color:#2563eb">${ratio}</strong> (越小越環保)</span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('瓦楞紙箱 3D 立體與同類項合併展開視圖', 50, 40);
+
+      // Draw isometric 3D box
+      const cx = 240;
+      const cy = 260;
+      const sc = 3.5;
+
+      const dx = a * sc * 0.866;
+      const dy = a * sc * 0.5;
+      const wx = -b * sc * 0.866;
+      const wy = b * sc * 0.5;
+      const hx = 0;
+      const hy = -c * sc;
+
+      // Front Face
+      ctx.fillStyle = 'rgba(59, 130, 246, 0.7)';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + dx, cy + dy);
+      ctx.lineTo(cx + dx + hx, cy + dy + hy);
+      ctx.lineTo(cx + hx, cy + hy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Top Face
+      ctx.fillStyle = 'rgba(96, 165, 250, 0.8)';
+      ctx.beginPath();
+      ctx.moveTo(cx + hx, cy + hy);
+      ctx.lineTo(cx + dx + hx, cy + dy + hy);
+      ctx.lineTo(cx + dx + wx + hx, cy + dy + wy + hy);
+      ctx.lineTo(cx + wx + hx, cy + wy + hy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Side Face
+      ctx.fillStyle = 'rgba(37, 99, 235, 0.8)';
+      ctx.beginPath();
+      ctx.moveTo(cx, cy);
+      ctx.lineTo(cx + wx, cy + wy);
+      ctx.lineTo(cx + wx + hx, cy + wy + hy);
+      ctx.lineTo(cx + hx, cy + hy);
+      ctx.closePath();
+      ctx.fill();
+      ctx.stroke();
+
+      // Labels on 3D
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`長 a=${a}`, cx + dx/2 + 10, cy + dy/2 + 20);
+      ctx.fillText(`寬 b=${b}`, cx + wx/2 - 40, cy + wy/2 + 15);
+      ctx.fillText(`高 c=${c}`, cx - 50, cy + hy/2);
+
+      // 2D Unfolding Layout on right side
+      ctx.fillStyle = '#e2e8f0';
+      ctx.fillRect(450, 100, 200, 240);
+      ctx.strokeStyle = '#475569';
+      ctx.strokeRect(450, 100, 200, 240);
+      ctx.fillStyle = '#334155';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('瓦楞紙十字展開圖', 480, 130);
+      ctx.fillText(`展開總耗紙 = 2(a+b)(b+c)`, 460, 220);
+    }
+
+    ['rngBoxA', 'rngBoxB', 'rngBoxC'].forEach(id => {
+      document.getElementById(id).addEventListener('input', update);
+    });
+
+    document.getElementById('btnCubeBox').onclick = () => { document.getElementById('rngBoxA').value = 20; document.getElementById('rngBoxB').value = 20; document.getElementById('rngBoxC').value = 20; update(); };
+    document.getElementById('btnFlatBox').onclick = () => { document.getElementById('rngBoxA').value = 40; document.getElementById('rngBoxB').value = 30; document.getElementById('rngBoxC').value = 8; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 11 週：物理天平守恆與代數建模飛躍 (方程與等式性質)
+// ----------------------------------------------------------------------------
+window.experiments_g7[11] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-scale-balanced"></i> 左盤物品: <span id="valLeftPan" class="val-badge">2x + 3</span></label>
+        <button id="btnAddLeftX" class="btn-sm btn-primary">+x 砝碼</button>
+        <button id="btnAddLeft1" class="btn-sm btn-secondary">+1 砝碼</button>
+        <button id="btnSubLeft1" class="btn-sm btn-outline">-1 砝碼</button>
+      </div>
+      <div class="control-row">
+        <label>右盤砝碼: <span id="valRightPan" class="val-badge">7</span></label>
+        <button id="btnAddRight1" class="btn-sm btn-secondary">+1 砝碼</button>
+        <button id="btnSubRight1" class="btn-sm btn-outline">-1 砝碼</button>
+        <button id="btnAddRight5" class="btn-sm btn-secondary">+5 砝碼</button>
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-sliders"></i> 未知數 x 真值滑桿: <span id="valTrueX" class="val-badge">x = 2</span></label>
+        <input type="range" id="rngTrueX" min="1" max="5" step="1" value="2">
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    let leftXCount = 2;
+    let leftConst = 3;
+    let rightConst = 7;
+
+    function update() {
+      const xVal = parseInt(document.getElementById('rngTrueX').value);
+      document.getElementById('valTrueX').textContent = `x = ${xVal}`;
+
+      document.getElementById('valLeftPan').textContent = `${leftXCount}x + ${leftConst}`;
+      document.getElementById('valRightPan').textContent = `${rightConst}`;
+
+      const totalLeft = leftXCount * xVal + leftConst;
+      const totalRight = rightConst;
+      const isBalanced = totalLeft === totalRight;
+
+      readout.innerHTML = `
+        <span class="readout-item">當前代數方程: <strong>${leftXCount}x + ${leftConst} = ${rightConst}</strong></span>
+        <span class="readout-item">左盤總重量: <strong>${totalLeft} g</strong></span>
+        <span class="readout-item">右盤總重量: <strong>${totalRight} g</strong></span>
+        <span class="readout-item">天平守恆狀態: <strong style="color:${isBalanced ? '#059669':'#dc2626'}">${isBalanced ? '✔ 完美守恆平衡 (等式成立)' : (totalLeft > totalRight ? '▲ 左盤偏重 (等式不成立)' : '▼ 右盤偏重 (等式不成立)')}</strong></span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('物理天平守恆與等式性質基本公理模擬台', 50, 40);
+
+      // Draw Balance Fulcrum & Beam
+      const pivotX = 350;
+      const pivotY = 220;
+      const tiltAngle = isBalanced ? 0 : (totalLeft > totalRight ? -0.12 : 0.12);
+
+      // Fulcrum Base
+      ctx.fillStyle = '#475569';
+      ctx.beginPath();
+      ctx.moveTo(pivotX, pivotY);
+      ctx.lineTo(pivotX - 30, pivotY + 120);
+      ctx.lineTo(pivotX + 30, pivotY + 120);
+      ctx.closePath();
+      ctx.fill();
+
+      // Beam
+      ctx.save();
+      ctx.translate(pivotX, pivotY);
+      ctx.rotate(tiltAngle);
+
+      ctx.strokeStyle = '#1e293b';
+      ctx.lineWidth = 6;
+      ctx.beginPath(); ctx.moveTo(-220, 0); ctx.lineTo(220, 0); ctx.stroke();
+
+      // Left pan strings & plate
+      ctx.strokeStyle = '#64748b';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(-220, 0); ctx.lineTo(-260, 80); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-220, 0); ctx.lineTo(-180, 80); ctx.stroke();
+      ctx.fillStyle = '#94a3b8';
+      ctx.fillRect(-270, 80, 100, 8);
+
+      // Right pan strings & plate
+      ctx.beginPath(); ctx.moveTo(220, 0); ctx.lineTo(180, 80); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(220, 0); ctx.lineTo(260, 80); ctx.stroke();
+      ctx.fillRect(170, 80, 100, 8);
+
+      // Left Pan items
+      ctx.fillStyle = '#2563eb';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(`${leftXCount}個[x] + ${leftConst}g`, -220, 70);
+
+      // Right Pan items
+      ctx.fillStyle = '#059669';
+      ctx.fillText(`${rightConst}g 砝碼`, 220, 70);
+
+      ctx.restore();
+      ctx.textAlign = 'left';
+    }
+
+    document.getElementById('rngTrueX').addEventListener('input', update);
+
+    document.getElementById('btnAddLeftX').onclick = () => { leftXCount++; update(); };
+    document.getElementById('btnAddLeft1').onclick = () => { leftConst++; update(); };
+    document.getElementById('btnSubLeft1').onclick = () => { if (leftConst > 0) leftConst--; update(); };
+    document.getElementById('btnAddRight1').onclick = () => { rightConst++; update(); };
+    document.getElementById('btnSubRight1').onclick = () => { if (rightConst > 0) rightConst--; update(); };
+    document.getElementById('btnAddRight5').onclick = () => { rightConst += 5; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 12 週：方程求解的標準消除演算法 (解一元一次方程)
+// ----------------------------------------------------------------------------
+window.experiments_g7[12] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-code-fork"></i> 當前方程: <span id="valEq12" class="val-badge">3x + 5 = x + 13</span></label>
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-forward-step"></i> 演算法步進控制 (五步消除程序):</label>
+        <button id="btnStepNext" class="btn-sm btn-primary">下一步消除</button>
+        <button id="btnStepReset" class="btn-sm btn-outline">重置為初始方程</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    let step = 0;
+    const steps = [
+      { name: '初始輸入', desc: '原始方程：3x + 5 = x + 13', eq: '3x + 5 = x + 13' },
+      { name: '第1步：去分母', desc: '本方程分母皆為 1，無需乘以公分母', eq: '3x + 5 = x + 13' },
+      { name: '第2步：去括號', desc: '無括號項，符合標準多項式形式', eq: '3x + 5 = x + 13' },
+      { name: '第3步：移項', desc: '含未知數項移至左邊，常數項移至右邊（注意變號！）', eq: '3x - x = 13 - 5' },
+      { name: '第4步：合併同類項', desc: '左邊 (3-1)x = 2x，右邊 13 - 5 = 8', eq: '2x = 8' },
+      { name: '第5步：係數化為 1', desc: '方程兩邊同除以係數 2，解得唯一的根', eq: 'x = 4' }
+    ];
+
+    function update() {
+      const cur = steps[step];
+      document.getElementById('valEq12').textContent = cur.eq;
+
+      readout.innerHTML = `
+        <span class="readout-item">當前程序環節: <strong>${cur.name}</strong></span>
+        <span class="readout-item">演算法指令: <strong>${cur.desc}</strong></span>
+        <span class="readout-item">方程狀態: <strong style="color:#2563eb">${cur.eq}</strong></span>
+        <span class="readout-item">檢驗結果: <strong>3(4)+5 = 17, 4+13 = 17 (等式完全成立)</strong></span>
+      `;
+
+      ctx.clearRect(0, 0, 700, 420);
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(0, 0, 700, 420);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 15px sans-serif';
+      ctx.fillText('一元一次方程有限步標準消除演算法流程圖', 50, 40);
+
+      // Draw Flowchart Boxes
+      const boxW = 100;
+      const boxH = 46;
+      const startX = 40;
+      const y = 180;
+
+      for (let i = 0; i < steps.length; i++) {
+        const x = startX + i * (boxW + 10);
+        const isActive = i === step;
+
+        ctx.fillStyle = isActive ? '#2563eb' : '#ffffff';
+        ctx.strokeStyle = isActive ? '#1d4ed8' : '#94a3b8';
+        ctx.lineWidth = isActive ? 3 : 1;
+        ctx.fillRect(x, y, boxW, boxH);
+        ctx.strokeRect(x, y, boxW, boxH);
+
+        ctx.fillStyle = isActive ? '#ffffff' : '#334155';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.textAlign = 'center';
+        ctx.fillText(steps[i].name, x + boxW / 2, y + 28);
+
+        // Arrow
+        if (i < steps.length - 1) {
+          ctx.strokeStyle = '#64748b';
+          ctx.lineWidth = 1.5;
+          ctx.beginPath();
+          ctx.moveTo(x + boxW, y + boxH / 2);
+          ctx.lineTo(x + boxW + 10, y + boxH / 2);
+          ctx.stroke();
+        }
+      }
+
+      // Display Big Equation
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 32px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(cur.eq, 350, 310);
+
+      ctx.textAlign = 'left';
+    }
+
+    document.getElementById('btnStepNext').onclick = () => {
+      step = (step + 1) % steps.length;
+      update();
+    };
+    document.getElementById('btnStepReset').onclick = () => {
+      step = 0;
+      update();
+    };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 13 週：電信套餐分界點與消費者決策 (一次方程模型)
+// ----------------------------------------------------------------------------
+window.experiments_g7[13] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-sliders"></i> 每月預計流量 g: <span id="valData13" class="val-badge">15 GB</span></label>
+        <input type="range" id="rngData13" min="0" max="35" step="1" value="15">
+      </div>
+      <div class="control-row">
+        <button id="btnPlanCross" class="btn-sm btn-secondary">跳至平衡臨界點 (22 GB)</button>
+        <button id="btnPlanLow" class="btn-sm btn-outline">輕度用量 (8 GB)</button>
+        <button id="btnPlanHigh" class="btn-sm btn-outline">重度用量 (30 GB)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function calcCost(g) {
+      let costA = 68;
+      if (g > 10) costA += (g - 10) * 5;
+      let costB = 128;
+      if (g > 20) costB += (g - 20) * 2;
+      return { costA, costB };
+    }
+
+    function update() {
+      const g = parseFloat(document.getElementById('rngData13').value);
+      document.getElementById('valData13').textContent = g + ' GB';
+      const { costA, costB } = calcCost(g);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('澳門電信方案費用曲線與交點決策分析', 20, 25);
+
+      const ox = 60, oy = 360, pw = 580, ph = 300;
+      ctx.strokeStyle = '#cbd5e1';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy); ctx.lineTo(ox + pw, oy);
+      ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - ph);
+      ctx.stroke();
+
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#64748b';
+      for (let gig = 0; gig <= 35; gig += 5) {
+        const x = ox + (gig / 35) * pw;
+        ctx.fillText(gig + 'G', x - 8, oy + 18);
+        ctx.beginPath(); ctx.moveTo(x, oy); ctx.lineTo(x, oy - 4); ctx.stroke();
+      }
+      for (let c = 50; c <= 200; c += 25) {
+        const y = oy - ((c - 50) / 150) * ph;
+        ctx.fillText('$' + c, ox - 35, y + 4);
+        ctx.beginPath(); ctx.moveTo(ox, y); ctx.lineTo(ox + 4, y); ctx.stroke();
+      }
+
+      // Plot Plan A
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let gig = 0; gig <= 35; gig += 0.5) {
+        const cost = calcCost(gig).costA;
+        const x = ox + (gig / 35) * pw;
+        const y = oy - ((cost - 50) / 150) * ph;
+        if (gig === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Plot Plan B
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let gig = 0; gig <= 35; gig += 0.5) {
+        const cost = calcCost(gig).costB;
+        const x = ox + (gig / 35) * pw;
+        const y = oy - ((cost - 50) / 150) * ph;
+        if (gig === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Intersection Point (g=22 is where 68+5*(g-10) = 128)
+      const crossG = 22;
+      const crossC = 128;
+      const cx = ox + (crossG / 35) * pw;
+      const cy = oy - ((crossC - 50) / 150) * ph;
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(cx, cy, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('臨界平衡點: 22 GB ($128)', cx + 10, cy - 8);
+
+      // Current g marker
+      const curX = ox + (g / 35) * pw;
+      ctx.strokeStyle = '#f59e0b';
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(curX, oy); ctx.lineTo(curX, oy - ph); ctx.stroke();
+      ctx.setLineDash([]);
+
+      const yA = oy - ((costA - 50) / 150) * ph;
+      const yB = oy - ((costB - 50) / 150) * ph;
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath(); ctx.arc(curX, yA, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath(); ctx.arc(curX, yB, 5, 0, Math.PI * 2); ctx.fill();
+
+      // Legend
+      ctx.fillStyle = '#2563eb'; ctx.fillText('■ Plan A (低月費 68元+5元/G)', ox + 20, 50);
+      ctx.fillStyle = '#10b981'; ctx.fillText('■ Plan B (大容量 128元+2元/G)', ox + 220, 50);
+
+      const best = costA < costB ? 'Plan A 更省錢' : (costA > costB ? 'Plan B 更省錢' : '兩方案費用相等 (臨界點)');
+      const diff = Math.abs(costA - costB);
+
+      readout.innerHTML = `
+        <span class="readout-item">當前用量: <strong>${g} GB</strong></span>
+        <span class="readout-item">Plan A 費用: <strong style="color:#2563eb;">${costA.toFixed(1)} MOP</strong></span>
+        <span class="readout-item">Plan B 費用: <strong style="color:#10b981;">${costB.toFixed(1)} MOP</strong></span>
+        <span class="readout-item">決策建議: <strong style="color:#b91c1c;">${best} (省 ${diff.toFixed(1)} 元)</strong></span>
+      `;
+    }
+
+    document.getElementById('rngData13').addEventListener('input', update);
+    document.getElementById('btnPlanCross').onclick = () => { document.getElementById('rngData13').value = 22; update(); };
+    document.getElementById('btnPlanLow').onclick = () => { document.getElementById('rngData13').value = 8; update(); };
+    document.getElementById('btnPlanHigh').onclick = () => { document.getElementById('rngData13').value = 30; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 14 週：港珠澳大橋無人機智能巡檢動態追及 (時空運動方程)
+// ----------------------------------------------------------------------------
+window.experiments_g7[14] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-plane-departure"></i> 巡檢船出發領先時間 t0: <span id="valT0" class="val-badge">15 分鐘</span></label>
+        <input type="range" id="rngT0" min="5" max="30" step="1" value="15">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-gauge-high"></i> 無人機飛行速度 v2: <span id="valV2" class="val-badge">90 km/h</span></label>
+        <input type="range" id="rngV2" min="60" max="150" step="5" value="90">
+      </div>
+      <div class="control-row">
+        <button id="btnPlayDrone" class="btn-sm btn-primary"><i class="fa-solid fa-play"></i> 動態模擬追及</button>
+        <button id="btnResetDrone" class="btn-sm btn-outline">重置狀態</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    let v1 = 30; // boat speed km/h
+    let animTime = 0;
+    let isPlaying = false;
+    let animReq = null;
+
+    function update() {
+      const t0_min = parseFloat(document.getElementById('rngT0').value);
+      const v2 = parseFloat(document.getElementById('rngV2').value);
+      document.getElementById('valT0').textContent = t0_min + ' 分鐘';
+      document.getElementById('valV2').textContent = v2 + ' km/h';
+
+      const t0_h = t0_min / 60;
+      const d0 = v1 * t0_h; // initial lead distance (km)
+      const t_catch_h = (v2 > v1) ? d0 / (v2 - v1) : 999;
+      const t_catch_min = t_catch_h * 60;
+      const d_catch = (v2 > v1) ? v2 * t_catch_h : 999;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Sea background & HZMB Bridge line
+      ctx.fillStyle = '#f0f9ff';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Draw HZMB Bridge
+      ctx.fillStyle = '#64748b';
+      ctx.fillRect(40, 200, 620, 16);
+      ctx.fillStyle = '#94a3b8';
+      for (let p = 60; p < 660; p += 60) {
+        ctx.fillRect(p, 216, 12, 100);
+      }
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('港珠澳大橋巡檢航道 (0 km - 55 km)', 40, 185);
+
+      // Scale: 50 km mapped to 560 px
+      const ox = 60, bridgePx = 560, maxKm = 50;
+
+      // Current simulation time
+      const curT_min = animTime;
+      const boatPosKm = Math.min(maxKm, v1 * (t0_min + curT_min) / 60);
+      const dronePosKm = Math.min(maxKm, (v2 * curT_min / 60));
+
+      const boatPx = ox + (boatPosKm / maxKm) * bridgePx;
+      const dronePx = ox + (dronePosKm / maxKm) * bridgePx;
+
+      // Draw Boat
+      ctx.fillStyle = '#0284c7';
+      ctx.fillRect(boatPx - 15, 230, 30, 14);
+      ctx.beginPath();
+      ctx.moveTo(boatPx + 15, 230);
+      ctx.lineTo(boatPx + 24, 237);
+      ctx.lineTo(boatPx + 15, 244);
+      ctx.fill();
+      ctx.fillStyle = '#0369a1';
+      ctx.font = '10px sans-serif';
+      ctx.fillText(`巡檢船 (${boatPosKm.toFixed(1)}km)`, boatPx - 25, 260);
+
+      // Draw Drone
+      ctx.fillStyle = '#dc2626';
+      ctx.beginPath();
+      ctx.arc(dronePx, 150, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = '#dc2626';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(dronePx - 14, 150); ctx.lineTo(dronePx + 14, 150);
+      ctx.moveTo(dronePx, 136); ctx.lineTo(dronePx, 164);
+      ctx.stroke();
+      ctx.fillStyle = '#b91c1c';
+      ctx.fillText(`無人機 (${dronePosKm.toFixed(1)}km)`, dronePx - 25, 130);
+
+      // Pursuit laser / line
+      ctx.strokeStyle = '#ef4444';
+      ctx.setLineDash([3, 3]);
+      ctx.beginPath(); ctx.moveTo(dronePx, 150); ctx.lineTo(boatPx, 230); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Catch-up point marker
+      if (v2 > v1 && d_catch <= maxKm) {
+        const catchPx = ox + (d_catch / maxKm) * bridgePx;
+        ctx.fillStyle = '#10b981';
+        ctx.beginPath(); ctx.arc(catchPx, 208, 6, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#047857';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(`理論追及點: ${d_catch.toFixed(1)} km`, catchPx - 30, 195);
+      }
+
+      readout.innerHTML = `
+        <span class="readout-item">巡檢船領先: <strong>${d0.toFixed(1)} km</strong></span>
+        <span class="readout-item">速度差: <strong>${(v2 - v1).toFixed(0)} km/h</strong></span>
+        <span class="readout-item">所需追及時間: <strong style="color:#2563eb;">${t_catch_min.toFixed(1)} 分鐘</strong></span>
+        <span class="readout-item">追及距離: <strong style="color:#10b981;">${d_catch.toFixed(1)} km</strong></span>
+      `;
+    }
+
+    document.getElementById('rngT0').addEventListener('input', () => { animTime = 0; update(); });
+    document.getElementById('rngV2').addEventListener('input', () => { animTime = 0; update(); });
+    document.getElementById('btnResetDrone').onclick = () => {
+      animTime = 0;
+      if (animReq) cancelAnimationFrame(animReq);
+      isPlaying = false;
+      document.getElementById('btnPlayDrone').innerHTML = '<i class="fa-solid fa-play"></i> 動態模擬追及';
+      update();
+    };
+
+    document.getElementById('btnPlayDrone').onclick = () => {
+      if (isPlaying) {
+        isPlaying = false;
+        if (animReq) cancelAnimationFrame(animReq);
+        document.getElementById('btnPlayDrone').innerHTML = '<i class="fa-solid fa-play"></i> 繼續';
+      } else {
+        isPlaying = true;
+        document.getElementById('btnPlayDrone').innerHTML = '<i class="fa-solid fa-pause"></i> 暫停';
+        function loop() {
+          if (!isPlaying) return;
+          const t0_min = parseFloat(document.getElementById('rngT0').value);
+          const v2 = parseFloat(document.getElementById('rngV2').value);
+          const t_catch_min = (v1 * (t0_min / 60)) / (v2 - v1) * 60;
+
+          animTime += 0.2;
+          if (animTime >= t_catch_min + 5) {
+            animTime = t_catch_min;
+            isPlaying = false;
+            document.getElementById('btnPlayDrone').innerHTML = '<i class="fa-solid fa-rotate-right"></i> 重新演示';
+          }
+          update();
+          if (isPlaying) animReq = requestAnimationFrame(loop);
+        }
+        loop();
+      }
+    };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 15 週：學校運動會場地測繪與射門視角 (幾何圖形與圓周角)
+// ----------------------------------------------------------------------------
+window.experiments_g7[15] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrows-up-down-left-right"></i> 球員橫向偏移 x (-15m 至 +15m): <span id="valPosX" class="val-badge">0.0 m</span></label>
+        <input type="range" id="rngPosX" min="-15" max="15" step="0.5" value="0">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-ruler-vertical"></i> 球員距球門線距離 y (3m 至 30m): <span id="valPosY" class="val-badge">11.0 m (點球點)</span></label>
+        <input type="range" id="rngPosY" min="3" max="30" step="0.5" value="11">
+      </div>
+      <div class="control-row">
+        <button id="btnPosPenalty" class="btn-sm btn-secondary">十二碼點球 (x=0, y=11)</button>
+        <button id="btnPosSide" class="btn-sm btn-outline">底線零角度 (x=10, y=3)</button>
+        <button id="btnPosMaxAngle" class="btn-sm btn-outline">大禁區弧頂 (x=0, y=16.5)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    const goalA = -3.66; // left post
+    const goalB = 3.66;  // right post
+
+    function update() {
+      const px = parseFloat(document.getElementById('rngPosX').value);
+      const py = parseFloat(document.getElementById('rngPosY').value);
+      document.getElementById('valPosX').textContent = px.toFixed(1) + ' m';
+      document.getElementById('valPosY').textContent = py.toFixed(1) + ' m';
+
+      // Angle calculation
+      const angleA = Math.atan2(px - goalA, py);
+      const angleB = Math.atan2(px - goalB, py);
+      const thetaRad = Math.abs(angleA - angleB);
+      const thetaDeg = (thetaRad * 180 / Math.PI);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Pitch background
+      ctx.fillStyle = '#15803d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Transformation: Pitch origin (0, 0) is at canvas (350, 360), scale 1m = 10px
+      const ox = 350, oy = 360, scale = 11;
+
+      // Goal line
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(ox - 22 * scale, oy);
+      ctx.lineTo(ox + 22 * scale, oy);
+      ctx.stroke();
+
+      // Penalty box (40.32m x 16.5m)
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(ox - 20.16 * scale, oy - 16.5 * scale, 40.32 * scale, 16.5 * scale);
+
+      // 6-yard box (18.32m x 5.5m)
+      ctx.strokeRect(ox - 9.16 * scale, oy - 5.5 * scale, 18.32 * scale, 5.5 * scale);
+
+      // Goal posts
+      const ax = ox + goalA * scale, ay = oy;
+      const bx = ox + goalB * scale, by = oy;
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(ax, ay, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(bx, by, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '10px sans-serif';
+      ctx.fillText('門柱 A', ax - 30, ay + 15);
+      ctx.fillText('門柱 B', bx + 5, ay + 15);
+
+      // Player Position P
+      const pXpx = ox + px * scale;
+      const pYpx = oy - py * scale;
+
+      // Sight lines PA and PB
+      ctx.strokeStyle = '#facc15';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(pXpx, pYpx); ctx.lineTo(ax, ay); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(pXpx, pYpx); ctx.lineTo(bx, by); ctx.stroke();
+
+      // Player circle
+      ctx.fillStyle = '#38bdf8';
+      ctx.beginPath(); ctx.arc(pXpx, pYpx, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('射門點 P', pXpx + 12, pYpx - 6);
+
+      // Circumcircle passing through A, B, P (Tangent circle principle)
+      // Midpoint of AB is (0, 0). Perpendicular bisector is x = 0.
+      // Circumcenter must lie on bisector of AB and bisector of AP.
+      const D = 2 * (ax * (by - pYpx) + bx * (pYpx - ay) + pXpx * (ay - by));
+      if (Math.abs(D) > 0.001) {
+        const Ux = ((ax*ax + ay*ay)*(by - pYpx) + (bx*bx + by*by)*(pYpx - ay) + (pXpx*pXpx + pYpx*pYpx)*(ay - by)) / D;
+        const Uy = ((ax*ax + ay*ay)*(pXpx - bx) + (bx*bx + by*by)*(ax - pXpx) + (pXpx*pXpx + pYpx*pYpx)*(bx - ax)) / D;
+        const R = Math.hypot(ax - Ux, ay - Uy);
+
+        ctx.strokeStyle = 'rgba(255, 255, 255, 0.4)';
+        ctx.setLineDash([4, 4]);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.arc(Ux, Uy, R, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
+      readout.innerHTML = `
+        <span class="readout-item">球員坐標: <strong>(${px.toFixed(1)}, ${py.toFixed(1)}) m</strong></span>
+        <span class="readout-item">左柱夾角: <strong>${(angleA * 180 / Math.PI).toFixed(1)}°</strong></span>
+        <span class="readout-item">右柱夾角: <strong>${(angleB * 180 / Math.PI).toFixed(1)}°</strong></span>
+        <span class="readout-item">有效射門視角 θ: <strong style="color:#facc15; font-size:1.15em;">${thetaDeg.toFixed(2)}°</strong></span>
+      `;
+    }
+
+    document.getElementById('rngPosX').addEventListener('input', update);
+    document.getElementById('rngPosY').addEventListener('input', update);
+    document.getElementById('btnPosPenalty').onclick = () => { document.getElementById('rngPosX').value = 0; document.getElementById('rngPosY').value = 11; update(); };
+    document.getElementById('btnPosSide').onclick = () => { document.getElementById('rngPosX').value = 10; document.getElementById('rngPosY').value = 3; update(); };
+    document.getElementById('btnPosMaxAngle').onclick = () => { document.getElementById('rngPosX').value = 0; document.getElementById('rngPosY').value = 16.5; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 16 週：視錯覺幾何審查與建築垂直標準 (垂線段最短公理)
+// ----------------------------------------------------------------------------
+window.experiments_g7[16] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-ruler-combined"></i> 牆面傾斜角度 θ (-10° 至 +10°): <span id="valTilt" class="val-badge">0.0°</span></label>
+        <input type="range" id="rngTilt" min="-10" max="10" step="0.5" value="0">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrows-left-right"></i> 測量斜點偏移 x (-150px 至 +150px): <span id="valOffset" class="val-badge">60 px</span></label>
+        <input type="range" id="rngOffset" min="-150" max="150" step="5" value="60">
+      </div>
+      <div class="control-row">
+        <button id="btnToggleIllusion" class="btn-sm btn-secondary">切換黑林/繆勒視錯覺背景</button>
+        <button id="btnResetWall" class="btn-sm btn-outline">校正垂直 (0°)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    let showIllusion = false;
+
+    function update() {
+      const tiltDeg = parseFloat(document.getElementById('rngTilt').value);
+      const offset = parseFloat(document.getElementById('rngOffset').value);
+      document.getElementById('valTilt').textContent = tiltDeg.toFixed(1) + '°';
+      document.getElementById('valOffset').textContent = offset + ' px';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Title
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('建築垂直度鉛垂線檢驗與垂線段最短數學定理驗證', 20, 25);
+
+      const ox = 350, oy = 80, wallH = 260;
+
+      // Optional Illusion background (radiating lines that cause straight lines to look curved)
+      if (showIllusion) {
+        ctx.strokeStyle = '#e2e8f0';
+        ctx.lineWidth = 1;
+        for (let a = 0; a < Math.PI * 2; a += Math.PI / 16) {
+          ctx.beginPath();
+          ctx.moveTo(ox, oy + wallH / 2);
+          ctx.lineTo(ox + Math.cos(a) * 400, oy + wallH / 2 + Math.sin(a) * 400);
+          ctx.stroke();
+        }
+      }
+
+      // Draw Base Ground
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(50, oy + wallH); ctx.lineTo(650, oy + wallH); ctx.stroke();
+
+      // Plumb bob line (True vertical: 0 degrees)
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(ox, oy + wallH); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Plumb bob weight
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath();
+      ctx.arc(ox, oy + wallH, 8, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText('真鉛垂線 (基準 h = 260mm)', ox + 15, oy + wallH - 10);
+
+      // Wall Line with tilt
+      const tiltRad = tiltDeg * Math.PI / 180;
+      const wallBotX = ox + Math.tan(tiltRad) * wallH;
+      ctx.strokeStyle = Math.abs(tiltDeg) < 0.2 ? '#10b981' : '#ef4444';
+      ctx.lineWidth = 5;
+      ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(wallBotX, oy + wallH); ctx.stroke();
+
+      // Slanted measurement segment
+      const slantX = ox + offset;
+      const slantLen = Math.hypot(offset, wallH);
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(ox, oy); ctx.lineTo(slantX, oy + wallH); ctx.stroke();
+
+      // Right angle symbol if offset = 0
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 1.5;
+      ctx.strokeRect(ox, oy + wallH - 14, 14, 14);
+
+      readout.innerHTML = `
+        <span class="readout-item">牆體傾角: <strong>${tiltDeg.toFixed(1)}°</strong></span>
+        <span class="readout-item">垂線段長度: <strong>${wallH} mm (最短)</strong></span>
+        <span class="readout-item">斜線段長度: <strong style="color:#f59e0b;">${slantLen.toFixed(1)} mm</strong></span>
+        <span class="readout-item">幾何公理: <strong style="color:#10b981;">垂線段最短 (差值 +${(slantLen - wallH).toFixed(1)}mm)</strong></span>
+      `;
+    }
+
+    document.getElementById('rngTilt').addEventListener('input', update);
+    document.getElementById('rngOffset').addEventListener('input', update);
+    document.getElementById('btnResetWall').onclick = () => { document.getElementById('rngTilt').value = 0; update(); };
+    document.getElementById('btnToggleIllusion').onclick = () => { showIllusion = !showIllusion; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 17 週：澳門輕軌雙軌平行與潛望鏡光學 (幾何推理與平行線判定)
+// ----------------------------------------------------------------------------
+window.experiments_g7[17] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-compass-drafting"></i> 上反射鏡旋轉角 α1: <span id="valAlpha1" class="val-badge">45.0°</span></label>
+        <input type="range" id="rngAlpha1" min="30" max="60" step="1" value="45">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-compass-drafting"></i> 下反射鏡旋轉角 α2: <span id="valAlpha2" class="val-badge">45.0°</span></label>
+        <input type="range" id="rngAlpha2" min="30" max="60" step="1" value="45">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrows-up-down"></i> 入射雷射高度 y: <span id="valLaserY" class="val-badge">90 px</span></label>
+        <input type="range" id="rngLaserY" min="60" max="130" step="2" value="90">
+      </div>
+      <div class="control-row">
+        <button id="btnSet45" class="btn-sm btn-secondary">標準平行潛望 (45° / 45°)</button>
+        <button id="btnDistort" class="btn-sm btn-outline">非平行畸變 (50° / 40°)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const a1_deg = parseFloat(document.getElementById('rngAlpha1').value);
+      const a2_deg = parseFloat(document.getElementById('rngAlpha2').value);
+      const laserY = parseFloat(document.getElementById('rngLaserY').value);
+      document.getElementById('valAlpha1').textContent = a1_deg.toFixed(1) + '°';
+      document.getElementById('valAlpha2').textContent = a2_deg.toFixed(1) + '°';
+      document.getElementById('valLaserY').textContent = laserY + ' px';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Title
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('潛望鏡雙反射平行光學光路與同位角/內錯角公理驗證', 20, 25);
+
+      // Draw Periscope Tube Outline
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      // Outer border
+      ctx.moveTo(80, 50); ctx.lineTo(380, 50); ctx.lineTo(380, 280); ctx.lineTo(650, 280);
+      ctx.moveTo(80, 150); ctx.lineTo(260, 150); ctx.lineTo(260, 380); ctx.lineTo(650, 380);
+      ctx.stroke();
+
+      // Mirror 1 at (320, laserY)
+      const m1x = 320, m1y = laserY;
+      const m1_rad = (a1_deg * Math.PI) / 180;
+      const mLen = 50;
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(m1x - Math.cos(m1_rad) * mLen, m1y - Math.sin(m1_rad) * mLen);
+      ctx.lineTo(m1x + Math.cos(m1_rad) * mLen, m1y + Math.sin(m1_rad) * mLen);
+      ctx.stroke();
+
+      // Mirror 2 at (320, 330)
+      const m2x = 320, m2y = 330;
+      const m2_rad = (a2_deg * Math.PI) / 180;
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 6;
+      ctx.beginPath();
+      ctx.moveTo(m2x - Math.cos(m2_rad) * mLen, m2y - Math.sin(m2_rad) * mLen);
+      ctx.lineTo(m2x + Math.cos(m2_rad) * mLen, m2y + Math.sin(m2_rad) * mLen);
+      ctx.stroke();
+
+      // Ray Tracing:
+      // Incident ray: horizontal from x=40 to m1x
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(40, laserY); ctx.lineTo(m1x, m1y); ctx.stroke();
+
+      // Reflection 1: Incident angle i1 = 90 - a1. Reflected ray angle theta1 = 2 * a1
+      const theta1_deg = 2 * a1_deg;
+      const theta1_rad = (theta1_deg * Math.PI) / 180;
+
+      // Middle ray hits mirror 2
+      ctx.beginPath(); ctx.moveTo(m1x, m1y); ctx.lineTo(m2x, m2y); ctx.stroke();
+
+      // Emergent ray angle: if a1=45 and a2=45, emergent is purely horizontal (0 deg)
+      // Deviation = 2 * (a1 - a2)
+      const dev_deg = 2 * (a1_deg - a2_deg);
+      const dev_rad = (dev_deg * Math.PI) / 180;
+      const endX = 640;
+      const endY = m2y + Math.tan(dev_rad) * (endX - m2x);
+
+      ctx.beginPath(); ctx.moveTo(m2x, m2y); ctx.lineTo(endX, endY); ctx.stroke();
+
+      // Parallel status
+      const isParallel = Math.abs(a1_deg - a2_deg) < 0.1 && Math.abs(a1_deg - 45) < 0.1;
+      const statusText = isParallel ? '✔ 出射光線與入射光線絕對平行 (同位角互等)' : `✖ 出射光線偏角: ${dev_deg.toFixed(1)}° (非平行)`;
+
+      readout.innerHTML = `
+        <span class="readout-item">鏡1夾角: <strong>${a1_deg.toFixed(1)}°</strong></span>
+        <span class="readout-item">鏡2夾角: <strong>${a2_deg.toFixed(1)}°</strong></span>
+        <span class="readout-item">偏轉角差: <strong>${dev_deg.toFixed(1)}°</strong></span>
+        <span class="readout-item">平行判定: <strong style="color:${isParallel ? '#10b981' : '#ef4444'};">${statusText}</strong></span>
+      `;
+    }
+
+    document.getElementById('rngAlpha1').addEventListener('input', update);
+    document.getElementById('rngAlpha2').addEventListener('input', update);
+    document.getElementById('rngLaserY').addEventListener('input', update);
+    document.getElementById('btnSet45').onclick = () => { document.getElementById('rngAlpha1').value = 45; document.getElementById('rngAlpha2').value = 45; update(); };
+    document.getElementById('btnDistort').onclick = () => { document.getElementById('rngAlpha1').value = 52; document.getElementById('rngAlpha2').value = 40; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 18 週：澳門葡式碎石路花紋的拓撲平移 (向量幾何變換)
+// ----------------------------------------------------------------------------
+window.experiments_g7[18] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrows-turn-to-dots"></i> 水平平移向量 Δx: <span id="valVecX" class="val-badge">60 px</span></label>
+        <input type="range" id="rngVecX" min="30" max="120" step="5" value="60">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrows-turn-to-dots"></i> 垂直平移向量 Δy: <span id="valVecY" class="val-badge">0 px</span></label>
+        <input type="range" id="rngVecY" min="-40" max="40" step="5" value="0">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-layer-group"></i> 重複鋪設週期數 N: <span id="valRepeat" class="val-badge">6 週期</span></label>
+        <input type="range" id="rngRepeat" min="2" max="10" step="1" value="6">
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const dx = parseFloat(document.getElementById('rngVecX').value);
+      const dy = parseFloat(document.getElementById('rngVecY').value);
+      const N = parseInt(document.getElementById('rngRepeat').value);
+      document.getElementById('valVecX').textContent = dx + ' px';
+      document.getElementById('valVecY').textContent = dy + ' px';
+      document.getElementById('valRepeat').textContent = N + ' 週期';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Title
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('澳門議事亭前地葡式黑白波浪碎石路 (Calçada Portuguesa) 向量平移', 20, 25);
+
+      // Function to draw one wave tile module at (bx, by)
+      function drawWaveModule(bx, by, isHighlighted) {
+        ctx.fillStyle = isHighlighted ? '#f59e0b' : '#0f172a';
+        ctx.beginPath();
+        ctx.moveTo(bx, by);
+        ctx.bezierCurveTo(bx + 20, by - 30, bx + 40, by + 30, bx + 60, by);
+        ctx.lineTo(bx + 60, by + 40);
+        ctx.bezierCurveTo(bx + 40, by + 70, bx + 20, by + 10, bx, by + 40);
+        ctx.closePath();
+        ctx.fill();
+
+        // White stone counter-wave
+        ctx.fillStyle = isHighlighted ? '#fde68a' : '#e2e8f0';
+        ctx.beginPath();
+        ctx.moveTo(bx, by + 40);
+        ctx.bezierCurveTo(bx + 20, by + 10, bx + 40, by + 70, bx + 60, by + 40);
+        ctx.lineTo(bx + 60, by + 80);
+        ctx.bezierCurveTo(bx + 40, by + 110, bx + 20, by + 50, bx, by + 80);
+        ctx.closePath();
+        ctx.fill();
+      }
+
+      // Base tile position
+      const startX = 60, startY = 160;
+
+      // Draw all translated tiles
+      for (let row = 0; row < 3; row++) {
+        for (let col = 0; col < N; col++) {
+          const curX = startX + col * dx;
+          const curY = startY + row * 90 + col * dy;
+          drawWaveModule(curX, curY, col === 0 && row === 0);
+        }
+      }
+
+      // Draw vector arrow from base to first translation
+      ctx.strokeStyle = '#ef4444';
+      ctx.fillStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(startX + 30, startY + 20);
+      ctx.lineTo(startX + 30 + dx, startY + 20 + dy);
+      ctx.stroke();
+
+      // Arrow head
+      const arrowX = startX + 30 + dx, arrowY = startY + 20 + dy;
+      ctx.beginPath();
+      ctx.arc(arrowX, arrowY, 5, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`平移向量 v = (${dx}, ${dy})`, arrowX + 8, arrowY - 6);
+
+      readout.innerHTML = `
+        <span class="readout-item">基準元坐標: <strong>(${startX}, ${startY})</strong></span>
+        <span class="readout-item">平移向量 v: <strong style="color:#ef4444;">(${dx}, ${dy}) px</strong></span>
+        <span class="readout-item">重複鋪設週期: <strong>${N} 次</strong></span>
+        <span class="readout-item">變換特性: <strong style="color:#10b981;">圖形形狀與大小保持不變 (全等變換)</strong></span>
+      `;
+    }
+
+    document.getElementById('rngVecX').addEventListener('input', update);
+    document.getElementById('rngVecY').addEventListener('input', update);
+    document.getElementById('rngRepeat').addEventListener('input', update);
+
+    update();
+  }
+};\n
+
+// ----------------------------------------------------------------------------
+// 第 19 週：√2 之謎與第一次數學危機 (反證法與無理數探索)
+// ----------------------------------------------------------------------------
+window.experiments_g7[19] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-square"></i> 單位正方形邊長 a: <span id="valSide19" class="val-badge">1.0</span></label>
+        <input type="range" id="rngSide19" min="1" max="5" step="1" value="1">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-magnifying-glass-plus"></i> 數軸無窮放大倍率: <span id="valZoom19" class="val-badge">1x</span></label>
+        <input type="range" id="rngZoom19" min="1" max="100" step="5" value="1">
+      </div>
+      <div class="control-row">
+        <button id="btnFraction1" class="btn-sm btn-secondary">有理數逼近 7/5 (1.40, 平方=1.96)</button>
+        <button id="btnFraction2" class="btn-sm btn-secondary">有理數逼近 1414/1000 (平方=1.999396)</button>
+        <button id="btnIrrational" class="btn-sm btn-outline">無窮不循環 √2 (1.41421356...)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const a = parseInt(document.getElementById('rngSide19').value);
+      const zoom = parseInt(document.getElementById('rngZoom19').value);
+      document.getElementById('valSide19').textContent = a.toFixed(1);
+      document.getElementById('valZoom19').textContent = zoom + 'x';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('畢達哥拉斯單位正方形對角線 √2 與數軸無窮小縫隙檢驗', 20, 25);
+
+      // Draw Unit Square
+      const ox = 80, oy = 260, pxSize = 130;
+      ctx.fillStyle = '#f8fafc';
+      ctx.fillRect(ox, oy - pxSize, pxSize, pxSize);
+      ctx.strokeStyle = '#334155';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(ox, oy - pxSize, pxSize, pxSize);
+
+      // Diagonal
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(ox + pxSize, oy - pxSize);
+      ctx.stroke();
+
+      // Diagonal rotation arc onto x-axis
+      const diagLen = Math.SQRT2 * pxSize;
+      ctx.strokeStyle = '#f59e0b';
+      ctx.setLineDash([4, 4]);
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(ox, oy, diagLen, -Math.PI / 4, 0);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Point on number line
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath();
+      ctx.arc(ox + diagLen, oy, 6, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillText('√2 點落於數軸', ox + diagLen - 20, oy + 25);
+
+      // Zoomed Number Line below
+      const numY = 340;
+      ctx.strokeStyle = '#0f172a';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(40, numY); ctx.lineTo(660, numY); ctx.stroke();
+
+      // Number line center around 1.4142
+      const centerVal = Math.SQRT2;
+      const span = 0.5 / zoom;
+      const minVal = centerVal - span;
+      const maxVal = centerVal + span;
+
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#64748b';
+      for (let i = 0; i <= 10; i++) {
+        const v = minVal + (i / 10) * (2 * span);
+        const x = 60 + (i / 10) * 580;
+        ctx.beginPath(); ctx.moveTo(x, numY); ctx.lineTo(x, numY - 6); ctx.stroke();
+        ctx.fillText(v.toFixed(3), x - 15, numY + 18);
+      }
+
+      // Root 2 exact marker on zoomed axis
+      const root2X = 60 + ((centerVal - minVal) / (2 * span)) * 580;
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(root2X, numY, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`√2 ≈ 1.41421356... (不可表示為整數比 p/q)`, root2X - 110, numY - 14);
+
+      readout.innerHTML = `
+        <span class="readout-item">正方形邊長 a: <strong>${a}</strong></span>
+        <span class="readout-item">對角線長度: <strong>${(a * Math.SQRT2).toFixed(6)}</strong></span>
+        <span class="readout-item">奇偶反證法: <strong>若 p/q 最簡，則 p, q 必同時為偶數，產生矛盾！</strong></span>
+        <span class="readout-item">數系分類: <strong style="color:#ef4444;">無理數 (無限不循環小數)</strong></span>
+      `;
+    }
+
+    document.getElementById('rngSide19').addEventListener('input', update);
+    document.getElementById('rngZoom19').addEventListener('input', update);
+    document.getElementById('btnFraction1').onclick = () => { document.getElementById('rngZoom19').value = 5; update(); };
+    document.getElementById('btnFraction2').onclick = () => { document.getElementById('rngZoom19').value = 30; update(); };
+    document.getElementById('btnIrrational').onclick = () => { document.getElementById('rngZoom19').value = 80; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 20 週：二分法迭代逼近無理數演算法 (LDW 數值分析)
+// ----------------------------------------------------------------------------
+window.experiments_g7[20] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-bullseye"></i> 目標開方數 S: <span id="valS20" class="val-badge">2</span></label>
+        <input type="range" id="rngS20" min="2" max="10" step="1" value="2">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-list-ol"></i> 二分迭代步數: <span id="valStep20" class="val-badge">1 步</span></label>
+        <button id="btnStepNext" class="btn-sm btn-primary">下一步 (二分截半)</button>
+        <button id="btnStepReset" class="btn-sm btn-outline">重置區間 [1, S]</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    let low = 1.0;
+    let high = 2.0;
+    let stepCount = 0;
+
+    function resetInterval() {
+      const S = parseFloat(document.getElementById('rngS20').value);
+      low = 1.0;
+      high = S;
+      stepCount = 0;
+      document.getElementById('valStep20').textContent = stepCount + ' 步';
+      update();
+    }
+
+    function update() {
+      const S = parseFloat(document.getElementById('rngS20').value);
+      document.getElementById('valS20').textContent = S;
+      const mid = (low + high) / 2;
+      const midSq = mid * mid;
+      const trueVal = Math.sqrt(S);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText(`計算機開平方二分搜索演算法逼近 √${S}`, 20, 25);
+
+      // Draw number line bracket [low, high]
+      const ox = 60, oy = 160, barW = 580;
+      ctx.fillStyle = '#f1f5f9';
+      ctx.fillRect(ox, oy - 20, barW, 40);
+
+      // Search space bracket
+      const scale = barW / (S - 1.0);
+      const lowPx = ox + (low - 1.0) * scale;
+      const highPx = ox + (high - 1.0) * scale;
+      const midPx = ox + (mid - 1.0) * scale;
+      const truePx = ox + (trueVal - 1.0) * scale;
+
+      // Active Search Interval Highlight
+      ctx.fillStyle = '#bae6fd';
+      ctx.fillRect(lowPx, oy - 15, Math.max(2, highPx - lowPx), 30);
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(lowPx, oy - 15, Math.max(2, highPx - lowPx), 30);
+
+      // True Target Line
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.moveTo(truePx, oy - 30); ctx.lineTo(truePx, oy + 30); ctx.stroke();
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(`真值 √${S} ≈ ${trueVal.toFixed(6)}`, truePx - 40, oy - 36);
+
+      // Midpoint Line
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath(); ctx.moveTo(midPx, oy - 25); ctx.lineTo(midPx, oy + 25); ctx.stroke();
+      ctx.fillStyle = '#d97706';
+      ctx.fillText(`中點 m = ${mid.toFixed(6)} (m² = ${midSq.toFixed(5)})`, midPx - 60, oy + 45);
+
+      // Iteration History Table on Canvas
+      ctx.fillStyle = '#334155';
+      ctx.font = '12px monospace';
+      ctx.fillText('區間左界 low: ' + low.toFixed(6), ox, 260);
+      ctx.fillText('區間右界 high: ' + high.toFixed(6), ox, 285);
+      ctx.fillText('區間長度誤差: ' + (high - low).toExponential(3), ox, 310);
+      ctx.fillText('判定規則: ' + (midSq < S ? `m² < ${S} ⇒ 根在右半區 ⇒ low = m` : `m² > ${S} ⇒ 根在左半區 ⇒ high = m`), ox, 335);
+
+      readout.innerHTML = `
+        <span class="readout-item">迭代步數: <strong>第 ${stepCount} 步</strong></span>
+        <span class="readout-item">當前中點 m: <strong>${mid.toFixed(6)}</strong></span>
+        <span class="readout-item">m² 與目標 S 差: <strong>${(midSq - S).toFixed(6)}</strong></span>
+        <span class="readout-item">誤差界限: <strong style="color:#10b981;">±${((high - low) / 2).toExponential(2)}</strong></span>
+      `;
+    }
+
+    document.getElementById('rngS20').addEventListener('input', resetInterval);
+    document.getElementById('btnStepReset').onclick = resetInterval;
+    document.getElementById('btnStepNext').onclick = () => {
+      const S = parseFloat(document.getElementById('rngS20').value);
+      const mid = (low + high) / 2;
+      if (mid * mid < S) {
+        low = mid;
+      } else {
+        high = mid;
+      }
+      stepCount++;
+      document.getElementById('valStep20').textContent = stepCount + ' 步';
+      update();
+    };
+
+    resetInterval();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 21 週：澳門城市網格與 GPS 衛星定位 (三邊測量術)
+// ----------------------------------------------------------------------------
+window.experiments_g7[21] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-satellite"></i> 衛星 A 測距 r1: <span id="valR1_21" class="val-badge">180 px</span></label>
+        <input type="range" id="rngR1_21" min="80" max="320" step="5" value="180">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-satellite"></i> 衛星 B 測距 r2: <span id="valR2_21" class="val-badge">190 px</span></label>
+        <input type="range" id="rngR2_21" min="80" max="320" step="5" value="190">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-satellite"></i> 衛星 C 測距 r3: <span id="valR3_21" class="val-badge">170 px</span></label>
+        <input type="range" id="rngR3_21" min="80" max="320" step="5" value="170">
+      </div>
+      <div class="control-row">
+        <button id="btnLockGPS" class="btn-sm btn-secondary">精確鎖定大三巴牌坊 (交於一點)</button>
+        <button id="btnErrorGPS" class="btn-sm btn-outline">大氣延遲誤差 (不交於一點)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    // Satellites positions
+    const satA = { x: 180, y: 100, name: '衛星 A (北天)' };
+    const satB = { x: 520, y: 120, name: '衛星 B (東天)' };
+    const satC = { x: 330, y: 350, name: '衛星 C (南天)' };
+
+    // Target User Position (Ruins of St. Paul)
+    const targetUser = { x: 340, y: 210 };
+
+    function update() {
+      const r1 = parseFloat(document.getElementById('rngR1_21').value);
+      const r2 = parseFloat(document.getElementById('rngR2_21').value);
+      const r3 = parseFloat(document.getElementById('rngR3_21').value);
+      document.getElementById('valR1_21').textContent = r1 + ' px';
+      document.getElementById('valR2_21').textContent = r2 + ' px';
+      document.getElementById('valR3_21').textContent = r3 + ' px';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Grid background
+      ctx.strokeStyle = '#f1f5f9';
+      ctx.lineWidth = 1;
+      for (let x = 0; x < canvas.width; x += 40) {
+        ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, canvas.height); ctx.stroke();
+      }
+      for (let y = 0; y < canvas.height; y += 40) {
+        ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(canvas.width, y); ctx.stroke();
+      }
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('澳門城市直角坐標網格與 GPS 三球交匯 (Trilateration) 定位', 20, 25);
+
+      // Function to draw satellite and circle
+      function drawSat(s, r, color) {
+        // Range Circle
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 2;
+        ctx.setLineDash([4, 4]);
+        ctx.beginPath(); ctx.arc(s.x, s.y, r, 0, Math.PI * 2); ctx.stroke();
+        ctx.setLineDash([]);
+
+        // Satellite icon
+        ctx.fillStyle = color;
+        ctx.beginPath(); ctx.arc(s.x, s.y, 8, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 11px sans-serif';
+        ctx.fillText(s.name, s.x - 30, s.y - 12);
+      }
+
+      drawSat(satA, r1, '#2563eb');
+      drawSat(satB, r2, '#059669');
+      drawSat(satC, r3, '#d97706');
+
+      // Target position
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(targetUser.x, targetUser.y, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#991b1b';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('大三巴標的 (340, 210)', targetUser.x + 10, targetUser.y - 5);
+
+      // Check distance deviations from target
+      const dev1 = Math.abs(Math.hypot(satA.x - targetUser.x, satA.y - targetUser.y) - r1);
+      const dev2 = Math.abs(Math.hypot(satB.x - targetUser.x, satB.y - targetUser.y) - r2);
+      const dev3 = Math.abs(Math.hypot(satC.x - targetUser.x, satC.y - targetUser.y) - r3);
+      const totalDev = dev1 + dev2 + dev3;
+
+      const isLocked = totalDev < 8;
+
+      readout.innerHTML = `
+        <span class="readout-item">衛星 A 誤差: <strong>${dev1.toFixed(1)} px</strong></span>
+        <span class="readout-item">衛星 B 誤差: <strong>${dev2.toFixed(1)} px</strong></span>
+        <span class="readout-item">衛星 C 誤差: <strong>${dev3.toFixed(1)} px</strong></span>
+        <span class="readout-item">定位狀態: <strong style="color:${isLocked ? '#10b981' : '#ef4444'};">${isLocked ? '✔ 完美鎖定交點 (唯一解)' : '三圓交會重合度不足'}</strong></span>
+      `;
+    }
+
+    document.getElementById('rngR1_21').addEventListener('input', update);
+    document.getElementById('rngR2_21').addEventListener('input', update);
+    document.getElementById('rngR3_21').addEventListener('input', update);
+
+    document.getElementById('btnLockGPS').onclick = () => {
+      const r1 = Math.round(Math.hypot(satA.x - targetUser.x, satA.y - targetUser.y));
+      const r2 = Math.round(Math.hypot(satB.x - targetUser.x, satB.y - targetUser.y));
+      const r3 = Math.round(Math.hypot(satC.x - targetUser.x, satC.y - targetUser.y));
+      document.getElementById('rngR1_21').value = r1;
+      document.getElementById('rngR2_21').value = r2;
+      document.getElementById('rngR3_21').value = r3;
+      update();
+    };
+
+    document.getElementById('btnErrorGPS').onclick = () => {
+      document.getElementById('rngR1_21').value = 140;
+      document.getElementById('rngR2_21').value = 240;
+      document.getElementById('rngR3_21').value = 130;
+      update();
+    };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 22 週：橫琴無人小巴路徑規劃與向量平移 (坐標幾何變換)
+// ----------------------------------------------------------------------------
+window.experiments_g7[22] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-compass"></i> 小巴前進航向角 θ (-45° 至 +45°): <span id="valAngle22" class="val-badge">0°</span></label>
+        <input type="range" id="rngAngle22" min="-45" max="45" step="5" value="0">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrows-left-right"></i> 障礙物橫向位置 x_obs: <span id="valObs22" class="val-badge">350 px</span></label>
+        <input type="range" id="rngObs22" min="200" max="500" step="10" value="350">
+      </div>
+      <div class="control-row">
+        <button id="btnAvoidObstacle" class="btn-sm btn-secondary">自動向量避障 (平移繞行)</button>
+        <button id="btnResetBus" class="btn-sm btn-outline">直行路線 (0°)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const angleDeg = parseFloat(document.getElementById('rngAngle22').value);
+      const obsX = parseFloat(document.getElementById('rngObs22').value);
+      document.getElementById('valAngle22').textContent = angleDeg + '°';
+      document.getElementById('valObs22').textContent = obsX + ' px';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('橫琴口岸自動駕駛無人小巴動態向量避障模擬', 20, 25);
+
+      // Road background
+      ctx.fillStyle = '#334155';
+      ctx.fillRect(40, 120, 620, 180);
+
+      // Lane markings
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([15, 15]);
+      ctx.beginPath(); ctx.moveTo(40, 210); ctx.lineTo(660, 210); ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Start position (80, 210)
+      const startX = 80, startY = 210;
+
+      // Obstacle at (obsX, 210)
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(obsX - 15, 195, 30, 30);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('施工障礙', obsX - 22, 190);
+
+      // Trajectory based on vector translation
+      const angleRad = (angleDeg * Math.PI) / 180;
+      ctx.strokeStyle = '#38bdf8';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.moveTo(startX, startY);
+
+      let currentX = startX;
+      let currentY = startY;
+      let collision = false;
+
+      for (let s = 0; s < 450; s += 5) {
+        currentX += 5 * Math.cos(angleRad);
+        currentY += 5 * Math.sin(angleRad);
+        ctx.lineTo(currentX, currentY);
+
+        if (Math.hypot(currentX - obsX, currentY - 210) < 22) {
+          collision = true;
+        }
+      }
+      ctx.stroke();
+
+      // Bus icon
+      ctx.fillStyle = collision ? '#dc2626' : '#10b981';
+      ctx.fillRect(startX - 10, startY - 14, 28, 28);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 10px sans-serif';
+      ctx.fillText('小巴', startX - 7, startY + 4);
+
+      // Collision Warning or Safe
+      const statusText = collision ? '✖ 發生碰撞警報！需調整平移向量' : '✔ 安全通行無碰撞';
+
+      readout.innerHTML = `
+        <span class="readout-item">航向夾角: <strong>${angleDeg}°</strong></span>
+        <span class="readout-item">速度向量: <strong>(${ (20 * Math.cos(angleRad)).toFixed(1) }, ${ (20 * Math.sin(angleRad)).toFixed(1) }) m/s</strong></span>
+        <span class="readout-item">安全判定: <strong style="color:${collision ? '#ef4444' : '#10b981'};">${statusText}</strong></span>
+      `;
+    }
+
+    document.getElementById('rngAngle22').addEventListener('input', update);
+    document.getElementById('rngObs22').addEventListener('input', update);
+    document.getElementById('btnResetBus').onclick = () => { document.getElementById('rngAngle22').value = 0; update(); };
+    document.getElementById('btnAvoidObstacle').onclick = () => { document.getElementById('rngAngle22').value = -18; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 23 週：代入與加減消元的降維打擊本質 (線性代數矩陣消元啟蒙)
+// ----------------------------------------------------------------------------
+window.experiments_g7[23] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-chart-line"></i> 方程 L1: 2x + y = <span id="valC1_23" class="val-badge">10</span></label>
+        <input type="range" id="rngC1_23" min="4" max="20" step="1" value="10">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-chart-line"></i> 方程 L2: x - y = <span id="valC2_23" class="val-badge">2</span></label>
+        <input type="range" id="rngC2_23" min="-5" max="10" step="1" value="2">
+      </div>
+      <div class="control-row">
+        <button id="btnEliminateAdd" class="btn-sm btn-secondary">加減消元 (L1 + L2 消去 y)</button>
+        <button id="btnResetSystem" class="btn-sm btn-outline">標準系統 (x=4, y=2)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const c1 = parseFloat(document.getElementById('rngC1_23').value);
+      const c2 = parseFloat(document.getElementById('rngC2_23').value);
+      document.getElementById('valC1_23').textContent = c1;
+      document.getElementById('valC2_23').textContent = c2;
+
+      // Solving:
+      // 2x + y = c1
+      // x - y = c2
+      // Add: 3x = c1 + c2 => x = (c1 + c2) / 3
+      // y = x - c2
+      const xSol = (c1 + c2) / 3;
+      const ySol = xSol - c2;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('二元一次方程組幾何雙線交點與加減消元降維打擊', 20, 25);
+
+      // Coordinate System
+      const ox = 260, oy = 260, scale = 25;
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(40, oy); ctx.lineTo(650, oy); // x axis
+      ctx.moveTo(ox, 380); ctx.lineTo(ox, 50); // y axis
+      ctx.stroke();
+
+      // Tick marks
+      ctx.font = '10px sans-serif';
+      ctx.fillStyle = '#64748b';
+      for (let x = -6; x <= 14; x += 2) {
+        const px = ox + x * scale;
+        ctx.beginPath(); ctx.moveTo(px, oy); ctx.lineTo(px, oy - 4); ctx.stroke();
+        if (x !== 0) ctx.fillText(x, px - 6, oy + 15);
+      }
+      for (let y = -4; y <= 10; y += 2) {
+        const py = oy - y * scale;
+        ctx.beginPath(); ctx.moveTo(ox, py); ctx.lineTo(ox + 4, py); ctx.stroke();
+        if (y !== 0) ctx.fillText(y, ox - 18, py + 4);
+      }
+
+      // Plot Line 1: y = c1 - 2x
+      ctx.strokeStyle = '#2563eb';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let x = -5; x <= 12; x += 0.5) {
+        const y = c1 - 2 * x;
+        const px = ox + x * scale;
+        const py = oy - y * scale;
+        if (x === -5) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // Plot Line 2: y = x - c2
+      ctx.strokeStyle = '#10b981';
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      for (let x = -5; x <= 12; x += 0.5) {
+        const y = x - c2;
+        const px = ox + x * scale;
+        const py = oy - y * scale;
+        if (x === -5) ctx.moveTo(px, py); else ctx.lineTo(px, py);
+      }
+      ctx.stroke();
+
+      // Intersection Point
+      const ix = ox + xSol * scale;
+      const iy = oy - ySol * scale;
+      ctx.fillStyle = '#ef4444';
+      ctx.beginPath(); ctx.arc(ix, iy, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`唯一解 (${xSol.toFixed(2)}, ${ySol.toFixed(2)})`, ix + 12, iy - 8);
+
+      // Legend
+      ctx.fillStyle = '#2563eb'; ctx.fillText(`■ L1: 2x + y = ${c1}`, 450, 60);
+      ctx.fillStyle = '#10b981'; ctx.fillText(`■ L2: x - y = ${c2}`, 450, 80);
+
+      readout.innerHTML = `
+        <span class="readout-item">L1 + L2 相加: <strong>3x = ${(c1 + c2).toFixed(1)}</strong></span>
+        <span class="readout-item">消元解 x: <strong style="color:#2563eb;">x = ${xSol.toFixed(2)}</strong></span>
+        <span class="readout-item">代回解 y: <strong style="color:#10b981;">y = ${ySol.toFixed(2)}</strong></span>
+        <span class="readout-item">幾何意義: <strong>兩直線有且僅有一個交點</strong></span>
+      `;
+    }
+
+    document.getElementById('rngC1_23').addEventListener('input', update);
+    document.getElementById('rngC2_23').addEventListener('input', update);
+    document.getElementById('btnResetSystem').onclick = () => { document.getElementById('rngC1_23').value = 10; document.getElementById('rngC2_23').value = 2; update(); };
+    document.getElementById('btnEliminateAdd').onclick = () => { update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 24 週：澳門葡撻工坊原料配比與利潤平衡 (物料平衡方程組)
+// ----------------------------------------------------------------------------
+window.experiments_g7[24] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-cookie"></i> 傳統葡撻生產份數 x (盤): <span id="valTartX" class="val-badge">30 盤</span></label>
+        <input type="range" id="rngTartX" min="0" max="60" step="1" value="30">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-cheese"></i> 芝士葡撻生產份數 y (盤): <span id="valTartY" class="val-badge">20 盤</span></label>
+        <input type="range" id="rngTartY" min="0" max="60" step="1" value="20">
+      </div>
+      <div class="control-row">
+        <button id="btnFeasibleMax" class="btn-sm btn-secondary">物料極限平衡頂點 (x=30, y=40)</button>
+        <button id="btnResetTart" class="btn-sm btn-outline">預設配比 (x=30, y=20)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const x = parseInt(document.getElementById('rngTartX').value);
+      const y = parseInt(document.getElementById('rngTartY').value);
+      document.getElementById('valTartX').textContent = x + ' 盤';
+      document.getElementById('valTartY').textContent = y + ' 盤';
+
+      // Constraints:
+      // 面粉: 40x + 30y <= 2400 (g) => 4x + 3y <= 240
+      // 牛油: 20x + 30y <= 1800 (g) => 2x + 3y <= 180
+      const flourUsed = 40 * x + 30 * y;
+      const butterUsed = 20 * x + 30 * y;
+      const profit = 12 * x + 15 * y;
+
+      const flourExceeded = flourUsed > 2400;
+      const butterExceeded = butterUsed > 1800;
+      const isFeasible = !flourExceeded && !butterExceeded;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('澳門葡撻工坊原料雙約束可行域 (Feasible Polygon) 與利潤最佳化', 20, 25);
+
+      const ox = 70, oy = 340, scale = 5.2;
+
+      // Coordinate axes
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy); ctx.lineTo(ox + 550, oy);
+      ctx.moveTo(ox, oy); ctx.lineTo(ox, 50);
+      ctx.stroke();
+
+      // Feasible Polygon vertices: (0, 0), (60, 0), (30, 40), (0, 60)
+      // Intersection of 40x + 30y = 2400 and 20x + 30y = 1800:
+      // Subtract: 20x = 600 => x = 30, y = (1800 - 600) / 30 = 40
+      ctx.fillStyle = 'rgba(34, 197, 94, 0.2)';
+      ctx.beginPath();
+      ctx.moveTo(ox, oy);
+      ctx.lineTo(ox + 60 * scale, oy); // (60, 0)
+      ctx.lineTo(ox + 30 * scale, oy - 40 * scale); // (30, 40)
+      ctx.lineTo(ox, oy - 60 * scale); // (0, 60)
+      ctx.closePath();
+      ctx.fill();
+
+      // Constraint line 1: Flour (40x + 30y = 2400)
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy - 80 * scale);
+      ctx.lineTo(ox + 60 * scale, oy);
+      ctx.stroke();
+
+      // Constraint line 2: Butter (20x + 30y = 1800)
+      ctx.strokeStyle = '#f59e0b';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy - 60 * scale);
+      ctx.lineTo(ox + 90 * scale, oy);
+      ctx.stroke();
+
+      // Current point (x, y)
+      const curPx = ox + x * scale;
+      const curPy = oy - y * scale;
+      ctx.fillStyle = isFeasible ? '#16a34a' : '#dc2626';
+      ctx.beginPath(); ctx.arc(curPx, curPy, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#0f172a';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText(`當前 (${x}, ${y})`, curPx + 10, curPy - 5);
+
+      // Vertex Highlight (30, 40)
+      ctx.fillStyle = '#9333ea';
+      ctx.beginPath(); ctx.arc(ox + 30 * scale, oy - 40 * scale, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.fillText('最優頂點 (30, 40)', ox + 30 * scale + 8, oy - 40 * scale - 6);
+
+      readout.innerHTML = `
+        <span class="readout-item">面粉消耗: <strong style="color:${flourExceeded ? '#ef4444' : '#2563eb'};">${flourUsed} / 2400 g</strong></span>
+        <span class="readout-item">牛油消耗: <strong style="color:${butterExceeded ? '#ef4444' : '#f59e0b'};">${butterUsed} / 1800 g</strong></span>
+        <span class="readout-item">當前利潤: <strong style="color:#10b981;">${profit} MOP</strong></span>
+        <span class="readout-item">可行性: <strong style="color:${isFeasible ? '#10b981' : '#ef4444'};">${isFeasible ? '✔ 在可行域內' : '✖ 原料超額透支！'}</strong></span>
+      `;
+    }
+
+    document.getElementById('rngTartX').addEventListener('input', update);
+    document.getElementById('rngTartY').addEventListener('input', update);
+    document.getElementById('btnFeasibleMax').onclick = () => { document.getElementById('rngTartX').value = 30; document.getElementById('rngTartY').value = 40; update(); };
+    document.getElementById('btnResetTart').onclick = () => { document.getElementById('rngTartX').value = 30; document.getElementById('rngTartY').value = 20; update(); };
+
+    update();
+  }
+};\n
+
+// ----------------------------------------------------------------------------
+// 第 25 週：藥品安全劑量與電梯超載邊界 (不等號方向顛倒數理證明)
+// ----------------------------------------------------------------------------
+window.experiments_g7[25] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-calculator"></i> 乘數 k (-3 至 +3): <span id="valK25" class="val-badge">-1.0</span></label>
+        <input type="range" id="rngK25" min="-3" max="3" step="0.5" value="-1">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-arrows-left-right"></i> 基準數 a: <span id="valA25" class="val-badge">2</span>，基準數 b: <span id="valB25" class="val-badge">5</span> (始終 a < b)</label>
+      </div>
+      <div class="control-row">
+        <button id="btnNegMul" class="btn-sm btn-secondary">乘以負數 k = -2 (符號顛倒)</button>
+        <button id="btnPosMul" class="btn-sm btn-outline">乘以正數 k = +2 (符號不變)</button>
+        <button id="btnZeroMul" class="btn-sm btn-outline">乘以零 k = 0 (退化為相等)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    const a = 2, b = 5;
+
+    function update() {
+      const k = parseFloat(document.getElementById('rngK25').value);
+      document.getElementById('valK25').textContent = k.toFixed(1);
+
+      const ka = k * a;
+      const kb = k * b;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('不等式性質三：兩邊同乘負數不等號方向顛倒數軸幾何鏡像證明', 20, 25);
+
+      const ox = 350, oy1 = 140, oy2 = 280, scale = 18;
+
+      // Draw Top Axis: Original a and b
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(50, oy1); ctx.lineTo(650, oy1); ctx.stroke();
+      ctx.fillStyle = '#475569';
+      ctx.font = '11px sans-serif';
+      ctx.fillText('原始數軸 (基準 a=2, b=5): 2 < 5', 50, oy1 - 25);
+
+      // Ticks for Top Axis
+      for (let x = -15; x <= 15; x += 5) {
+        const px = ox + x * scale;
+        ctx.beginPath(); ctx.moveTo(px, oy1 - 5); ctx.lineTo(px, oy1 + 5); ctx.stroke();
+        ctx.fillText(x, px - 6, oy1 + 18);
+      }
+
+      // Points a and b on Top Axis
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath(); ctx.arc(ox + a * scale, oy1, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillText('a (2)', ox + a * scale - 10, oy1 - 12);
+
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath(); ctx.arc(ox + b * scale, oy1, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillText('b (5)', ox + b * scale - 10, oy1 - 12);
+
+      // Draw Bottom Axis: Multiplied by k
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath(); ctx.moveTo(50, oy2); ctx.lineTo(650, oy2); ctx.stroke();
+      ctx.fillStyle = '#475569';
+      ctx.fillText(`同乘 k = ${k.toFixed(1)} 變換後數軸:`, 50, oy2 - 25);
+
+      for (let x = -15; x <= 15; x += 5) {
+        const px = ox + x * scale;
+        ctx.beginPath(); ctx.moveTo(px, oy2 - 5); ctx.lineTo(px, oy2 + 5); ctx.stroke();
+        ctx.fillText(x, px - 6, oy2 + 18);
+      }
+
+      // Connecting curves with arrows
+      ctx.strokeStyle = k < 0 ? '#ef4444' : '#0284c7';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([3, 3]);
+
+      ctx.beginPath();
+      ctx.moveTo(ox + a * scale, oy1);
+      ctx.quadraticCurveTo(ox + (a + ka)/2 * scale, (oy1 + oy2)/2, ox + ka * scale, oy2);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.moveTo(ox + b * scale, oy1);
+      ctx.quadraticCurveTo(ox + (b + kb)/2 * scale, (oy1 + oy2)/2, ox + kb * scale, oy2);
+      ctx.stroke();
+      ctx.setLineDash([]);
+
+      // Points ka and kb on Bottom Axis
+      ctx.fillStyle = '#2563eb';
+      ctx.beginPath(); ctx.arc(ox + ka * scale, oy2, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillText(`k·a (${ka.toFixed(1)})`, ox + ka * scale - 18, oy2 + 32);
+
+      ctx.fillStyle = '#10b981';
+      ctx.beginPath(); ctx.arc(ox + kb * scale, oy2, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillText(`k·b (${kb.toFixed(1)})`, ox + kb * scale - 18, oy2 + 32);
+
+      // Relation Symbol
+      let symbol = '<';
+      let symColor = '#0284c7';
+      let ruleDesc = '正數同乘，大小順序保持不變';
+      if (k < 0) {
+        symbol = '>';
+        symColor = '#ef4444';
+        ruleDesc = '負數同乘觸發軸對稱翻轉，不等號必須顛倒方向！';
+      } else if (k === 0) {
+        symbol = '=';
+        symColor = '#f59e0b';
+        ruleDesc = '乘以 0 退化為等式 0 = 0';
+      }
+
+      ctx.fillStyle = symColor;
+      ctx.font = 'bold 22px sans-serif';
+      ctx.fillText(`${ka.toFixed(1)}  ${symbol}  ${kb.toFixed(1)}`, ox - 40, oy2 - 35);
+
+      readout.innerHTML = `
+        <span class="readout-item">乘數 k: <strong>${k.toFixed(1)}</strong></span>
+        <span class="readout-item">k·a 與 k·b: <strong>${ka.toFixed(1)} 和 ${kb.toFixed(1)}</strong></span>
+        <span class="readout-item">不等關係: <strong style="color:${symColor}; font-size:1.15em;">${ka.toFixed(1)} ${symbol} ${kb.toFixed(1)}</strong></span>
+        <span class="readout-item">數學定理: <strong>${ruleDesc}</strong></span>
+      `;
+    }
+
+    document.getElementById('rngK25').addEventListener('input', update);
+    document.getElementById('btnNegMul').onclick = () => { document.getElementById('rngK25').value = -2; update(); };
+    document.getElementById('btnPosMul').onclick = () => { document.getElementById('rngK25').value = 2; update(); };
+    document.getElementById('btnZeroMul').onclick = () => { document.getElementById('rngK25').value = 0; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 26 週：初一年級研學租車費用最佳化 (不等式組整數解與運籌)
+// ----------------------------------------------------------------------------
+window.experiments_g7[26] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-users"></i> 研學總人數 N: <span id="valN26" class="val-badge">180 人</span></label>
+        <input type="range" id="rngN26" min="120" max="240" step="5" value="180">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-bus"></i> 大巴 (45座, 800元/輛) vs 中巴 (30座, 600元/輛):</label>
+      </div>
+      <div class="control-row">
+        <button id="btnOptimalBus" class="btn-sm btn-secondary">一鍵鎖定最低費用配置</button>
+        <button id="btnAllBig" class="btn-sm btn-outline">全租大巴</button>
+        <button id="btnAllSmall" class="btn-sm btn-outline">全租中巴</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const N = parseInt(document.getElementById('rngN26').value);
+      document.getElementById('valN26').textContent = N + ' 人';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('初一年級研學租車運籌邊界與整數格點最優費用搜索', 20, 25);
+
+      const ox = 80, oy = 350, scaleX = 65, scaleY = 38;
+
+      // Coordinate axes (x: big bus, y: small bus)
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy); ctx.lineTo(ox + 550, oy);
+      ctx.moveTo(ox, oy); ctx.lineTo(ox, 50);
+      ctx.stroke();
+
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#64748b';
+      ctx.fillText('大巴數量 x (45座)', ox + 450, oy + 25);
+      ctx.fillText('中巴數量 y (30座)', ox - 20, 45);
+
+      // Ticks
+      for (let x = 0; x <= 8; x++) {
+        const px = ox + x * scaleX;
+        ctx.beginPath(); ctx.moveTo(px, oy); ctx.lineTo(px, oy - 4); ctx.stroke();
+        ctx.fillText(x, px - 4, oy + 16);
+      }
+      for (let y = 0; y <= 8; y++) {
+        const py = oy - y * scaleY;
+        ctx.beginPath(); ctx.moveTo(ox, py); ctx.lineTo(ox + 4, py); ctx.stroke();
+        ctx.fillText(y, ox - 18, py + 4);
+      }
+
+      // Constraint line: 45x + 30y >= N => y >= (N - 45x) / 30
+      ctx.strokeStyle = '#3b82f6';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy - (N / 30) * scaleY);
+      ctx.lineTo(ox + (N / 45) * scaleX, oy);
+      ctx.stroke();
+
+      // Find integer lattice points and min cost
+      let minCost = Infinity;
+      let optPair = { x: 0, y: 0 };
+      const feasiblePoints = [];
+
+      for (let x = 0; x <= 7; x++) {
+        for (let y = 0; y <= 7; y++) {
+          const cap = 45 * x + 30 * y;
+          const cost = 800 * x + 600 * y;
+          const px = ox + x * scaleX;
+          const py = oy - y * scaleY;
+
+          if (cap >= N) {
+            feasiblePoints.push({ x, y, cost, cap });
+            if (cost < minCost) {
+              minCost = cost;
+              optPair = { x, y, cap, cost };
+            }
+            // Draw feasible point
+            ctx.fillStyle = '#10b981';
+            ctx.beginPath(); ctx.arc(px, py, 4, 0, Math.PI * 2); ctx.fill();
+          } else {
+            // Infeasible point
+            ctx.fillStyle = '#cbd5e1';
+            ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
+          }
+        }
+      }
+
+      // Highlight Optimal Point
+      const optPx = ox + optPair.x * scaleX;
+      const optPy = oy - optPair.y * scaleY;
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(optPx, optPy, 8, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText(`最佳配置: (${optPair.x}大, ${optPair.y}中) 費用 $${optPair.cost}`, optPx + 12, optPy - 10);
+
+      readout.innerHTML = `
+        <span class="readout-item">研學人數: <strong>${N} 人</strong></span>
+        <span class="readout-item">最優租車方案: <strong style="color:#ef4444;">${optPair.x} 輛大巴 + ${optPair.y} 輛中巴</strong></span>
+        <span class="readout-item">總載客量: <strong>${optPair.cap} 座位 (空位 ${optPair.cap - N})</strong></span>
+        <span class="readout-item">最低總費用: <strong style="color:#10b981; font-size:1.15em;">${optPair.cost} MOP</strong></span>
+      `;
+    }
+
+    document.getElementById('rngN26').addEventListener('input', update);
+    document.getElementById('btnOptimalBus').onclick = () => { update(); };
+    document.getElementById('btnAllBig').onclick = () => {
+      const N = parseInt(document.getElementById('rngN26').value);
+      const x = Math.ceil(N / 45);
+      showToast(`全租大巴: ${x} 輛，費用 ${x * 800} MOP`);
+    };
+    document.getElementById('btnAllSmall').onclick = () => {
+      const N = parseInt(document.getElementById('rngN26').value);
+      const y = Math.ceil(N / 30);
+      showToast(`全租中巴: ${y} 輛，費用 ${y * 600} MOP`);
+    };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 27 週：民調翻車慘案與抽樣偏差審查 (MAIL 媒體素養與抽樣偏差)
+// ----------------------------------------------------------------------------
+window.experiments_g7[27] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-phone"></i> 富裕車主/電話名錄抽樣偏差比率: <span id="valBias27" class="val-badge">75%</span></label>
+        <input type="range" id="rngBias27" min="0" max="100" step="5" value="75">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-users-viewfinder"></i> 抽樣調查樣本規模: <span id="valSample27" class="val-badge">1000 人</span></label>
+        <input type="range" id="rngSample27" min="200" max="2400" step="200" value="1000">
+      </div>
+      <div class="control-row">
+        <button id="btnHist1936" class="btn-sm btn-secondary">還原 1936 文學文摘真實偏差慘案</button>
+        <button id="btnRandomPoll" class="btn-sm btn-outline">科學分層隨機抽樣 (偏差 0%)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    // True Population parameters:
+    // Roosevelt (Candidate A): 62% true support in whole nation
+    // Landon (Candidate B): 38%
+    const trueA = 62;
+    const trueB = 38;
+
+    function update() {
+      const bias = parseFloat(document.getElementById('rngBias27').value);
+      const sampleSize = parseInt(document.getElementById('rngSample27').value);
+      document.getElementById('valBias27').textContent = bias + '%';
+      document.getElementById('valSample27').textContent = sampleSize + ' 人';
+
+      // Wealthy group prefers Landon (A: 40%, B: 60%)
+      // Working class prefers Roosevelt (A: 75%, B: 25%)
+      const sampleRoosevelt = (bias / 100) * 40 + (1 - bias / 100) * 75;
+      const sampleLandon = 100 - sampleRoosevelt;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('1936 美國總統大選民調翻車慘案：電話抽樣偏差與總體代表性檢驗', 20, 25);
+
+      const ox = 120, oy = 130, barH = 50, maxW = 420;
+
+      // Group 1: True Population
+      ctx.fillStyle = '#475569';
+      ctx.font = 'bold 12px sans-serif';
+      ctx.fillText('全體選民真實支持率 (真理總體):', ox, oy - 15);
+
+      // True Roosevelt
+      const trueAw = (trueA / 100) * maxW;
+      ctx.fillStyle = '#2563eb';
+      ctx.fillRect(ox, oy, trueAw, barH);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = 'bold 13px sans-serif';
+      ctx.fillText(`羅斯福 ${trueA}% (實際大勝)`, ox + 20, oy + 30);
+
+      // True Landon
+      const trueBw = (trueB / 100) * maxW;
+      ctx.fillStyle = '#dc2626';
+      ctx.fillRect(ox + trueAw, oy, trueBw, barH);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`蘭登 ${trueB}%`, ox + trueAw + 20, oy + 30);
+
+      // Group 2: Poll Sample
+      const oy2 = 250;
+      ctx.fillStyle = '#475569';
+      ctx.fillText(`雜誌民調預測支持率 (樣本 N=${sampleSize}):`, ox, oy2 - 15);
+
+      const sampleAw = (sampleRoosevelt / 100) * maxW;
+      const sampleBw = (sampleLandon / 100) * maxW;
+
+      ctx.fillStyle = '#3b82f6';
+      ctx.fillRect(ox, oy2, sampleAw, barH);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`羅斯福 ${sampleRoosevelt.toFixed(1)}%`, ox + 15, oy2 + 30);
+
+      ctx.fillStyle = '#ef4444';
+      ctx.fillRect(ox + sampleAw, oy2, sampleBw, barH);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(`蘭登 ${sampleLandon.toFixed(1)}%`, ox + sampleAw + 15, oy2 + 30);
+
+      // Verdict
+      const winner = sampleRoosevelt > 50 ? '預測羅斯福勝 (正確)' : '預測蘭登勝 (民調翻車慘劇！)';
+      const winColor = sampleRoosevelt > 50 ? '#10b981' : '#b91c1c';
+
+      readout.innerHTML = `
+        <span class="readout-item">抽樣樣本量: <strong>${sampleSize} 份</strong></span>
+        <span class="readout-item">名錄偏差率: <strong>${bias}% (富裕階層過度代表)</strong></span>
+        <span class="readout-item">民調預測結論: <strong style="color:${winColor}; font-size:1.15em;">${winner}</strong></span>
+        <span class="readout-item">批判性思維: <strong>樣本規模大不代表代表性好！</strong></span>
+      `;
+    }
+
+    document.getElementById('rngBias27').addEventListener('input', update);
+    document.getElementById('rngSample27').addEventListener('input', update);
+    document.getElementById('btnHist1936').onclick = () => { document.getElementById('rngBias27').value = 85; update(); };
+    document.getElementById('btnRandomPoll').onclick = () => { document.getElementById('rngBias27').value = 0; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 28 週：校服批量定做與正態分佈直覺 (頻數直方圖與組距)
+// ----------------------------------------------------------------------------
+window.experiments_g7[28] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-chart-column"></i> 直方圖分組組距 w: <span id="valBinW28" class="val-badge">5 cm</span></label>
+        <input type="range" id="rngBinW28" min="2" max="15" step="1" value="5">
+      </div>
+      <div class="control-row">
+        <button id="btnNormalFit" class="btn-sm btn-secondary">疊加常態高斯分佈鐘形曲線</button>
+        <button id="btnFineBin" class="btn-sm btn-outline">微細組距 (2 cm)</button>
+        <button id="btnCoarseBin" class="btn-sm btn-outline">粗略組距 (10 cm)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+    let showGauss = true;
+
+    // Synthetic Height Data for Form 1 (Mean = 158cm, Std = 6.5cm, N = 500)
+    const heights = [];
+    for (let i = 0; i < 500; i++) {
+      // Box-Muller transform
+      const u1 = Math.random();
+      const u2 = Math.random();
+      const z = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+      heights.push(158 + z * 6.5);
+    }
+
+    function update() {
+      const binW = parseInt(document.getElementById('rngBinW28').value);
+      document.getElementById('valBinW28').textContent = binW + ' cm';
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('初一年級 500 名學生身高頻數分佈直方圖與常態分佈擬合', 20, 25);
+
+      const minH = 135, maxH = 185;
+      const numBins = Math.ceil((maxH - minH) / binW);
+      const bins = new Array(numBins).fill(0);
+
+      heights.forEach(h => {
+        if (h >= minH && h < maxH) {
+          const idx = Math.floor((h - minH) / binW);
+          if (idx >= 0 && idx < numBins) bins[idx]++;
+        }
+      });
+
+      const maxCount = Math.max(...bins);
+      const ox = 70, oy = 350, plotW = 560, plotH = 260;
+
+      // Draw Histogram Bars
+      const barPxW = plotW / numBins;
+      bins.forEach((cnt, idx) => {
+        const barPxH = (cnt / maxCount) * plotH;
+        const x = ox + idx * barPxW;
+        const y = oy - barPxH;
+
+        ctx.fillStyle = '#60a5fa';
+        ctx.fillRect(x, y, barPxW - 2, barPxH);
+        ctx.strokeStyle = '#2563eb';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(x, y, barPxW - 2, barPxH);
+
+        // Value text
+        if (barPxW > 20) {
+          ctx.fillStyle = '#1e293b';
+          ctx.font = '10px sans-serif';
+          ctx.fillText(cnt, x + (barPxW - 2)/2 - 6, y - 5);
+        }
+      });
+
+      // Axis
+      ctx.strokeStyle = '#475569';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy); ctx.lineTo(ox + plotW, oy);
+      ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - plotH);
+      ctx.stroke();
+
+      // Axis labels
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#64748b';
+      for (let h = minH; h <= maxH; h += 10) {
+        const x = ox + ((h - minH) / (maxH - minH)) * plotW;
+        ctx.fillText(h + 'cm', x - 12, oy + 16);
+      }
+
+      // Normal Curve Overlay
+      if (showGauss) {
+        ctx.strokeStyle = '#dc2626';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        for (let xPx = 0; xPx <= plotW; xPx += 4) {
+          const h = minH + (xPx / plotW) * (maxH - minH);
+          const z = (h - 158) / 6.5;
+          const pdf = Math.exp(-0.5 * z * z) / (6.5 * Math.sqrt(2 * Math.PI));
+          const yPx = oy - (pdf * 500 * binW / maxCount) * plotH;
+          if (xPx === 0) ctx.moveTo(ox + xPx, yPx); else ctx.lineTo(ox + xPx, yPx);
+        }
+        ctx.stroke();
+      }
+
+      readout.innerHTML = `
+        <span class="readout-item">樣本總數: <strong>500 人</strong></span>
+        <span class="readout-item">當前組距 w: <strong>${binW} cm (共 ${numBins} 組)</strong></span>
+        <span class="readout-item">平均身高: <strong>158.2 cm</strong></span>
+        <span class="readout-item">統計定律: <strong style="color:#2563eb;">直方圖面積代表頻數總和</strong></span>
+      `;
+    }
+
+    document.getElementById('rngBinW28').addEventListener('input', update);
+    document.getElementById('btnFineBin').onclick = () => { document.getElementById('rngBinW28').value = 2; update(); };
+    document.getElementById('btnCoarseBin').onclick = () => { document.getElementById('rngBinW28').value = 10; update(); };
+    document.getElementById('btnNormalFit').onclick = () => { showGauss = !showGauss; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 29 週：澳門珠江鹹潮危機與壓鹹補淡 (跨學科水資源數據分析)
+// ----------------------------------------------------------------------------
+window.experiments_g7[29] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-water"></i> 上游水庫應急下洩流量 Q_fresh: <span id="valQfresh29" class="val-badge">1800 m³/s</span></label>
+        <input type="range" id="rngQfresh29" min="800" max="3200" step="100" value="1800">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-calendar-day"></i> 應急壓鹹推進天數 t: <span id="valDay29" class="val-badge">3 天</span></label>
+        <input type="range" id="rngDay29" min="1" max="10" step="1" value="3">
+      </div>
+      <div class="control-row">
+        <button id="btnOvercomeSalt" class="btn-sm btn-secondary">大流量快速壓鹹 (2800 m³/s)</button>
+        <button id="btnCrisis" class="btn-sm btn-outline">枯水期鹹潮爆發 (1000 m³/s)</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    function update() {
+      const qFresh = parseFloat(document.getElementById('rngQfresh29').value);
+      const days = parseInt(document.getElementById('rngDay29').value);
+      document.getElementById('valQfresh29').textContent = qFresh + ' m³/s';
+      document.getElementById('valDay29').textContent = days + ' 天';
+
+      // Salinity calculation model:
+      // Sea intrusion baseline: 800 mg/L
+      // Dilution factor inversely proportional to freshwater flow and accumulated time
+      const steadySalinity = 150 + 1800000 / (qFresh + 400);
+      const currentSalinity = steadySalinity + (750 - steadySalinity) * Math.exp(-0.35 * days);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('澳門青洲水廠水質氯化物含量動態稀釋曲線 (國家飲用水標準 250 mg/L)', 20, 25);
+
+      const ox = 70, oy = 350, pw = 580, ph = 260;
+
+      // Coordinate axes
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.moveTo(ox, oy); ctx.lineTo(ox + pw, oy);
+      ctx.moveTo(ox, oy); ctx.lineTo(ox, oy - ph);
+      ctx.stroke();
+
+      // Axis labels
+      ctx.font = '11px sans-serif';
+      ctx.fillStyle = '#64748b';
+      for (let d = 1; d <= 10; d++) {
+        const x = ox + ((d - 1) / 9) * pw;
+        ctx.fillText(`第${d}天`, x - 12, oy + 16);
+      }
+      for (let s = 100; s <= 800; s += 100) {
+        const y = oy - ((s - 100) / 700) * ph;
+        ctx.fillText(s, ox - 30, y + 4);
+        ctx.beginPath(); ctx.moveTo(ox, y); ctx.lineTo(ox + 4, y); ctx.stroke();
+      }
+
+      // 250 mg/L Safety Red Line
+      const safeY = oy - ((250 - 100) / 700) * ph;
+      ctx.strokeStyle = '#ef4444';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([6, 6]);
+      ctx.beginPath(); ctx.moveTo(ox, safeY); ctx.lineTo(ox + pw, safeY); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle = '#b91c1c';
+      ctx.font = 'bold 11px sans-serif';
+      ctx.fillText('★ 飲用水水質安全紅線 (250 mg/L)', ox + 20, safeY - 8);
+
+      // Plot Salinity curve over 10 days
+      ctx.strokeStyle = '#0284c7';
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      for (let d = 1; d <= 10; d += 0.2) {
+        const sal = steadySalinity + (750 - steadySalinity) * Math.exp(-0.35 * d);
+        const x = ox + ((d - 1) / 9) * pw;
+        const y = oy - ((sal - 100) / 700) * ph;
+        if (d === 1) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+
+      // Current Day Marker
+      const curX = ox + ((days - 1) / 9) * pw;
+      const curY = oy - ((currentSalinity - 100) / 700) * ph;
+      ctx.fillStyle = currentSalinity <= 250 ? '#10b981' : '#dc2626';
+      ctx.beginPath(); ctx.arc(curX, curY, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillText(`${currentSalinity.toFixed(1)} mg/L`, curX + 10, curY - 5);
+
+      const isSafe = currentSalinity <= 250;
+      const statusText = isSafe ? '✔ 符合自來水標準 (安全供水)' : '✖ 鹽度超標 (需持續壓鹹補淡)';
+
+      readout.innerHTML = `
+        <span class="readout-item">下洩淡水流量: <strong>${qFresh} m³/s</strong></span>
+        <span class="readout-item">水廠氯化物鹽度: <strong style="color:${isSafe ? '#10b981' : '#ef4444'};">${currentSalinity.toFixed(1)} mg/L</strong></span>
+        <span class="readout-item">水質安全檢驗: <strong style="color:${isSafe ? '#10b981' : '#ef4444'};">${statusText}</strong></span>
+      `;
+    }
+
+    document.getElementById('rngQfresh29').addEventListener('input', update);
+    document.getElementById('rngDay29').addEventListener('input', update);
+    document.getElementById('btnOvercomeSalt').onclick = () => { document.getElementById('rngQfresh29').value = 2800; document.getElementById('rngDay29').value = 5; update(); };
+    document.getElementById('btnCrisis').onclick = () => { document.getElementById('rngQfresh29').value = 1000; document.getElementById('rngDay29').value = 2; update(); };
+
+    update();
+  }
+};
+
+// ----------------------------------------------------------------------------
+// 第 30 週：智慧城市交通指數與 AI 決策大辯論 (PISA 2029 終極演練)
+// ----------------------------------------------------------------------------
+window.experiments_g7[30] = {
+  init: function(ctrl, canvas, readout) {
+    ctrl.innerHTML = `
+      <div class="control-row">
+        <label><i class="fa-solid fa-weight-scale"></i> 行程延誤時間權重 w1: <span id="valW1_30" class="val-badge">0.35</span></label>
+        <input type="range" id="rngW1_30" min="0.1" max="0.6" step="0.05" value="0.35">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-weight-scale"></i> 車龍長度權重 w2: <span id="valW2_30" class="val-badge">0.30</span></label>
+        <input type="range" id="rngW2_30" min="0.1" max="0.5" step="0.05" value="0.30">
+      </div>
+      <div class="control-row">
+        <label><i class="fa-solid fa-weight-scale"></i> 突發事故影響權重 w3: <span id="valW3_30" class="val-badge">0.35</span></label>
+        <input type="range" id="rngW3_30" min="0.1" max="0.5" step="0.05" value="0.35">
+      </div>
+      <div class="control-row">
+        <button id="btnRushHour" class="btn-sm btn-secondary">早高峰大塞車模擬</button>
+        <button id="btnSmartLight" class="btn-sm btn-outline">AI 智慧綠波帶疏導</button>
+      </div>
+    `;
+
+    const ctx = setupCanvas(canvas);
+
+    // 4 Districts in Macau:
+    // 1: 澳門半島中區, 2: 北區關閘, 3: 氹仔中心區, 4: 路氹城金光大道
+    let rawData = [
+      { name: '澳門半島中區', delay: 8.5, queue: 9.0, incident: 7.0 },
+      { name: '北區關閘口岸', delay: 9.2, queue: 9.5, incident: 8.0 },
+      { name: '氹仔市中心區', delay: 5.5, queue: 6.0, incident: 4.0 },
+      { name: '路氹金光大道', delay: 4.0, queue: 4.5, incident: 3.0 }
+    ];
+
+    function update() {
+      const w1 = parseFloat(document.getElementById('rngW1_30').value);
+      const w2 = parseFloat(document.getElementById('rngW2_30').value);
+      const w3 = parseFloat(document.getElementById('rngW3_30').value);
+      const totalW = w1 + w2 + w3;
+
+      document.getElementById('valW1_30').textContent = (w1 / totalW).toFixed(2);
+      document.getElementById('valW2_30').textContent = (w2 / totalW).toFixed(2);
+      document.getElementById('valW3_30').textContent = (w3 / totalW).toFixed(2);
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#1e293b';
+      ctx.font = 'bold 14px sans-serif';
+      ctx.fillText('澳門主要城區智慧交通擁堵綜合指數 (TCI) 動態權重評估雷達', 20, 25);
+
+      // Bar Chart for TCI
+      const ox = 80, oy = 340, barW = 90, gap = 45;
+
+      let highestTCI = -1;
+      let worstDistrict = '';
+
+      rawData.forEach((dist, idx) => {
+        // Weighted TCI
+        const tci = ((w1 * dist.delay + w2 * dist.queue + w3 * dist.incident) / totalW) * 10;
+        if (tci > highestTCI) {
+          highestTCI = tci;
+          worstDistrict = dist.name;
+        }
+
+        const barX = ox + idx * (barW + gap);
+        const barH = (tci / 100) * 240;
+        const barY = oy - barH;
+
+        let barColor = '#10b981';
+        if (tci > 60) barColor = '#f59e0b';
+        if (tci > 80) barColor = '#ef4444';
+
+        ctx.fillStyle = barColor;
+        ctx.fillRect(barX, barY, barW, barH);
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1;
+        ctx.strokeRect(barX, barY, barW, barH);
+
+        // Text labels
+        ctx.fillStyle = '#0f172a';
+        ctx.font = 'bold 12px sans-serif';
+        ctx.fillText(tci.toFixed(1), barX + 25, barY - 8);
+
+        ctx.font = '11px sans-serif';
+        ctx.fillStyle = '#475569';
+        ctx.fillText(dist.name, barX + 2, oy + 20);
+      });
+
+      // Axis
+      ctx.strokeStyle = '#94a3b8';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(ox - 20, oy); ctx.lineTo(ox + 520, oy);
+      ctx.moveTo(ox - 20, oy); ctx.lineTo(ox - 20, oy - 250);
+      ctx.stroke();
+
+      readout.innerHTML = `
+        <span class="readout-item">歸一化權重: <strong>w1=${(w1/totalW).toFixed(2)}, w2=${(w2/totalW).toFixed(2)}, w3=${(w3/totalW).toFixed(2)}</strong></span>
+        <span class="readout-item">最擁堵區域: <strong style="color:#ef4444;">${worstDistrict} (TCI: ${highestTCI.toFixed(1)})</strong></span>
+        <span class="readout-item">AI 決策建議: <strong>優先延長該區主幹道綠燈時長 25 秒</strong></span>
+      `;
+    }
+
+    document.getElementById('rngW1_30').addEventListener('input', update);
+    document.getElementById('rngW2_30').addEventListener('input', update);
+    document.getElementById('rngW3_30').addEventListener('input', update);
+
+    document.getElementById('btnRushHour').onclick = () => {
+      rawData[1].queue = 9.8;
+      rawData[1].delay = 9.6;
+      update();
+    };
+
+    document.getElementById('btnSmartLight').onclick = () => {
+      rawData.forEach(d => { d.queue *= 0.7; d.delay *= 0.75; });
+      update();
+    };
+
+    update();
+  }
+};\n
 
 
 // State
